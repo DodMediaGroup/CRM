@@ -1,0 +1,122 @@
+{% extends 'layout.html' %}
+{% block titulo %}Administrar Usuarios | Crm{% endblock %}
+{% block css %}
+<!-- Extra CSS Libraries Start -->
+<link href="/static/libs/jquery-datatables/css/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/jquery-datatables/extensions/TableTools/css/dataTables.tableTools.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/style.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/jquery-notifyjs/styles/metro/notify-metro.css" rel="stylesheet" type="text/css" />
+<!-- Extra CSS Libraries End -->
+{% endblock %}
+{% block contenido %}
+<div class="page-heading" style="display: block;">
+	<h1><img src="/static/img/iconos/usuarios-ico.png" alt=""> Usuarios</h1>
+	<h3>Usuarios actualmente registrados</h3>            	
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="widget">
+			<div class="widget-header">
+				<h2>Lista de Usuarios</h2>
+				<div class="additional-btn">
+					
+					<a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+					<a href="#" class="widget-close"><i class="icon-cancel-3"></i></a>
+				</div>
+			</div>
+			<div class="widget-content gris">
+			<br>					
+				<div class="table-responsive">
+					<form class='form-horizontal' role='form'>
+					<table id="datatables-2" class="table table-bordered" cellspacing="0" width="100%">
+					        <thead>
+					            <tr>
+					                <th>Usuario</th>
+					                <th>Grupo de usuario</th>
+					                <th>Último ingreso</th>
+					                <th>Estado</th>
+					                <th>Opciones</th>
+					            </tr>
+					        </thead>
+					 
+					        <tbody>
+					        	{% for u in usuarios %}
+					        		<tr>
+					        			<td>{{u.username}}</td>
+					        			<td>
+					        				{{u.groups.get}}
+					        			</td>
+					        			<td>{{u.last_login}}</td>
+					        			<td style="text-align:center">
+					        				{% if u.is_active %}
+												<span id="{{u.id}}_label" class="label label-success">Activo</span>
+					        				{% else %}
+												<span id="{{u.id}}_label" class="label label-danger">Inactivo</span>
+					        				{% endif %}
+					        			</td>
+					        			<td style="text-align:center">
+					        				<div class="btn-group btn-group-xs">
+												{# <a href="/usuarios/administrar-permisos/?id={{u.id}}" data-toggle="tooltip" title="" class="btn btn-default" data-original-title="Administrar Permisos"><i class="fa fa-key"></i></a> #}
+												<a href="/usuarios/editar-usuario/?id={{u.id}}" data-toggle="tooltip" title="" class="btn btn-default" data-original-title="Editar Usuario"><i class="fa fa-edit"></i></a>
+												{% if objeto_usuario.is_superuser %}	
+													{% if u.is_active %}
+														<a id="{{u.id}}_link_desactivar" data-toggle="tooltip" title="" onclick="nconfirm('{{u.first_name}} {{u.last_name}}','desactivarUsuario({{u.id}})','¿Desactivar Usuario?','Esta seguro que desea desactivar el usuario ')"  class="btn btn-default" data-original-title="Desactivar Usuario"><i class="fa fa-times"></i></a>
+							        					<a id="{{u.id}}_link_activar" style="display:none" data-toggle="tooltip" title="" onclick="nconfirm('{{u.first_name}} {{u.last_name}}','desactivarUsuario({{u.id}})','¿Activar Usuario?','Esta seguro que desea activar el usuario ')" class="btn btn-default" data-original-title="Activar Usuario"><i class="fa fa-check-square"></i></a>
+							        				{% else %}
+														<a id="{{u.id}}_link_desactivar" style="display:none" data-toggle="tooltip" title="" onclick="nconfirm('{{u.first_name}} {{u.last_name}}','desactivarUsuario({{u.id}})','¿Desactivar Usuario?','Esta seguro que desea desactivar el usuario ')"  class="btn btn-default" data-original-title="Desactivar Usuario"><i class="fa fa-times"></i></a>
+							        					<a id="{{u.id}}_link_activar"  data-toggle="tooltip" title="" onclick="nconfirm('{{u.first_name}} {{u.last_name}}','desactivarUsuario({{u.id}})','¿Activar Usuario?','Esta seguro que desea activar el usuario ')" class="btn btn-default" data-original-title="Activar Usuario"><i class="fa fa-check-square"></i></a>
+							        				{% endif %}
+							        			{% endif %}
+											</div>
+					        			</td>
+					        		</tr>
+					        	{% endfor %}
+					        </tbody>
+					    </table>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block js %}
+<!-- Page Specific JS Libraries -->
+<script src="/static/libs/jquery-datatables/js/jquery.dataTables.min.js"></script>
+<script src="/static/libs/jquery-datatables/js/dataTables.bootstrap.js"></script>
+<script src="/static/libs/jquery-datatables/extensions/TableTools/js/dataTables.tableTools.min.js"></script>
+<script src="/static/js/pages/datatables.js"></script>
+<script>
+	function desactivarUsuario(id_usuario) {
+		$.ajax({
+			url: '/usuarios/desactivar-usuario/',
+			type: 'get',
+			data: {'id_usuario': id_usuario},
+			success:function (data) {
+				if(data=='Activo'){
+					$("#"+id_usuario+"_label").removeClass('label-danger');
+					$("#"+id_usuario+"_label").addClass('label-success');
+					$("#"+id_usuario+"_link_desactivar").fadeIn();
+					$("#"+id_usuario+"_link_activar").fadeOut();
+				}else{
+					$("#"+id_usuario+"_label").removeClass('label-success');
+					$("#"+id_usuario+"_label").addClass('label-danger');
+					$("#"+id_usuario+"_link_activar").fadeIn();
+					$("#"+id_usuario+"_link_desactivar").fadeOut();
+				}
+				$("#"+id_usuario+"_label").html(data);
+				autohidenotify('success');
+			},
+			error:function (data) {
+				autohidenotify('error');
+			}
+		});
+		
+	}
+	$("#ver_usuarios").addClass("active");
+</script>
+<script src="/static/libs/jquery-notifyjs/notify.min.js"></script>
+<script src="/static/libs/jquery-notifyjs/styles/metro/notify-metro.js"></script>
+<script src="/static/js/pages/notifications.js"></script>
+{% endblock %}

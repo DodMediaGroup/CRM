@@ -1,0 +1,185 @@
+{% extends 'layout.html' %}
+{% block titulo %}
+Editar campaña {{campania.nombre}}
+{% endblock %}
+{% block css %}
+<link href="/static/libs/jquery-notifyjs/styles/metro/notify-metro.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+	.center{
+		text-align: center;
+	}
+</style>
+{% endblock %}
+{% block contenido %}
+<div class="page-heading" style="display: block;">
+	<h1><img src="/static/img/iconos/icono-campanias.png" alt=""> Seleccionar almacenes a los que va dirigida la campaña</h1>
+	<h3>{{campania.nombre}}</h3>            	
+</div>
+<div class="row">
+	<div class="col-sm-12">
+		<div class="widget">
+			<div class="widget-header"><h2>Opciones</h2></div>
+			<div class="widget-content padding">
+				<div class="row">
+					<div class="col-sm-1"></div>
+					<div id="div_opciones" class="col-sm-8 center">
+						<select name="" id="opciones" class="form-control">
+							<option value="">-- ¿Que deseas hacer? --</option>
+							<option value="todos">Seleccionar todos los almacenes</option>
+							<option value="categorias">Selecciona los almacenes de acuerdo a su categoría</option>
+							<option value="personalizado">Selecciona los almacenes que tu creas conveniente</option>
+						</select>
+						<br>
+					</div>
+					<div id="div_categorias" class="col-sm-4 center" style="display:none">
+						<select class="form-control" name="categorias">
+							<option value="">-- Seleccione Categoría --</option>
+							{% for c in categorias %}
+								<option value="{{c.identificador}}">{{c.nombre}}</option>
+							{% endfor %}
+						</select>
+						<br>
+					</div>
+					<div class="col-sm-2 center">
+						<button id="btn_aplicar_cambios" class="btn btn-default">Aplicar Cambios</button>
+						<br>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-12">
+		<div class="widget">
+			<div class="widget-header">
+				<h2>Almacenes que participan en la Campaña</h2>
+			</div>
+			<div class="widget-content">
+				<div class="table-responsive">
+					<table data-sortable class="table">
+						<thead>
+							<tr>
+								<th>No</th>
+								<th style="width: 30px" data-sortable="false"></th>
+								<th>Nombre</th>
+								<th>Categoría</th>
+								<th>Administrador</th>
+								<th>Correo</th>
+							</tr>
+						</thead>
+						
+						<tbody>
+							{% for a in almacenes %}
+							<tr>
+								<td>{{a.almacen.identificador}}</td>
+								<td>
+									<input 
+									type="checkbox" 
+									data-identificador="{{a.almacen.pk}}" 
+									id="check_{{a.almacen.pk}}"
+									data-categoria="{{a.almacen.categoria.pk}}" 
+									{{a.estado}}>
+								</td>
+								<td><strong>{{a.almacen.nombre}}</strong></td>
+								<td>{{a.almacen.categoria.nombre}}</td>
+								<td>{{a.almacen.nombre_admin}}</td>
+								<td><a href="mailto:{{a.correo}}">{{a.almacen.correo}}</a></td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block js %}
+<script src="/static/libs/jquery-notifyjs/notify.min.js"></script>
+<script src="/static/libs/jquery-notifyjs/styles/metro/notify-metro.js"></script>
+<script src="/static/js/pages/notifications.js"></script>
+<script>
+	function cambiar_estado (id,estado) {
+		$.ajax({
+			url: '/campanias/editar-participacion/',
+			type: 'get',
+			data: {'id':id,'estado':estado},
+			success: function (data) {
+				if(data=='Si'){
+					autohidenotify('success');
+				}else{
+					autohidenotify('error');
+				}
+			},
+			error: function (data) {
+				autohidenotify('error');
+			}
+		});
+	}
+	$("#campanias").addClass("active");
+	//$('input[type=checkbox]').iCheck('disable');
+	$("select[name=categorias]").on('change', function(event) {
+		if ($(this).val()!="") {
+			var categoria= $(this).val();
+			var inputs= $('input[type=checkbox]');
+			$('input[type=checkbox]').each(function(index, el) {
+				if($(this).attr('data-categoria')==categoria){
+					$(this).iCheck('check');
+				}else{
+					$(this).iCheck('uncheck');
+				}
+			});
+		};
+	});
+
+	var almacenes=[];
+
+	$("#btn_aplicar_cambios").on('click', function(event) {
+		almacenes=[];
+		$('input[type=checkbox]').each(function(index, el) {
+			if($(this).prop('checked')){
+				almacenes.push($(this).attr("data-identificador"));
+			}
+		});
+		$('input[type=checkbox]').iCheck('disable');
+		$(this).attr("disabled","");
+		$.ajax({
+			url: '/campanias/editar-participacion/',
+			type: 'get',
+			data: {'almacenes':JSON.stringify(almacenes),'id_campania':'{{campania.pk}}'},
+			success: function (data) {
+				window.location="/campanias/editar-almacenes-campania/?id={{campania.pk}}";
+			},
+			error: function (data) {
+				autohidenotify('error');
+			}
+		});
+	});
+
+	$("#opciones").on('change', function(event) {
+		if($(this).val()=="categorias"){
+			$("#div_opciones").removeClass('col-sm-8');
+			$("#div_opciones").addClass('col-sm-4');
+			$("#div_categorias").fadeIn();
+		}else{
+			$("#div_opciones").removeClass('col-sm-4');
+			$("#div_opciones").addClass('col-sm-8');
+			$("#div_categorias").css('display', 'none');
+		}
+
+		if($(this).val()=='todos'){
+			$('input[type=checkbox]').each(function(index, el) {
+				$(this).iCheck('check');
+			});
+		}
+
+		// if($(this).val()=="personalizado"){
+		// 	$('input[type=checkbox]').iCheck('enable');
+		// }else{
+		// 	$('input[type=checkbox]').iCheck('disable');
+		// }
+	});
+
+</script>
+{% endblock %}

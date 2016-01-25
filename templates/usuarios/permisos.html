@@ -1,0 +1,73 @@
+{% extends 'layout.html' %}
+{% block titulo %}Administrar Permisos de Usuario{% endblock %}
+{% block css %}
+<link href="/static/libs/jquery-notifyjs/styles/metro/notify-metro.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block contenido %}
+<div class="page-heading" style="display: block;">
+	<h1><i class="fa fa-key"></i> Administración de permisos para:</h1>
+	<h3>{{usuario.first_name}} {{usuario.last_name}}</h3>            	
+</div>
+<div class="row">
+	<div class="col-sm-12">
+		<div class="widget">
+			<div class="widget-header">
+				<h2>Permisos por módulo</h2>
+			</div>
+			<div class="widget-content padding">
+				<table id="datatables-1" class="table table-striped table-bordered" cellspacing="0" width="100%">
+					<thead>
+			            <tr>
+			                <th>Módulo</th>
+			                <th>Visualizar</th>
+			                <th>Editar</th>
+			            </tr>
+			        </thead>
+			        <tbody>
+			        	{% for um in usuario_modulos %}
+			        		<tr>
+			        			<td>{{um.modulo.nombre}}</td>
+			        			<td style="text-align:center">
+			        				<input type="checkbox" data-modulo="{{um.identificador}}" data-permiso="1" class="ios-switch ios-switch-success ios-switch-sm" {% if um.ver %}checked{% endif %}/>
+			        			</td>
+			        			<td style="text-align:center">
+			        				<input type="checkbox" data-modulo="{{um.identificador}}" data-permiso="2" class="ios-switch ios-switch-success ios-switch-sm" {% if um.crear %}checked{% endif %} />
+			        			</td>
+			        		</tr>
+			        	{% endfor %}
+			        </tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block ajax %}
+	<script>
+		$(document).ready(function() {
+			$(document).on('click', '.ios-switch-success', function(event) {
+				var modulo=$(this).parents("td").find('input').attr("data-modulo");
+				var permiso=$(this).parents("td").find('input').attr("data-permiso");
+				$.ajax({
+					url: '/usuarios/cambiar-permiso/',
+					type: 'get',
+					data: {'modulo':modulo,'permiso':permiso},
+					success:function (data) {
+						autohidenotify('success');
+					},
+					error:function (data) {
+						autohidenotify('error');
+					}
+				});
+			});
+		});
+		//$(this).attr('modulo')+' '+$(this).attr('permiso')
+		$("#usuarios").addClass("active");
+	</script>
+{% endblock %}
+
+{% block js %}
+<script src="/static/libs/jquery-notifyjs/notify.min.js"></script>
+<script src="/static/libs/jquery-notifyjs/styles/metro/notify-metro.js"></script>
+<script src="/static/js/pages/notifications.js"></script>
+{% endblock %}

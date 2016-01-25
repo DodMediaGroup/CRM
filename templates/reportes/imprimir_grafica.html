@@ -1,0 +1,55 @@
+<!doctype html> 
+<html>
+<head>
+	<title>Gráfica</title>
+	<link href="/static/libs/morrischart/morris.css" rel="stylesheet" type="text/css" />
+	<link href="/static/css/style.css" rel="stylesheet" type="text/css" />
+</head>
+<body id="cuerpo_grafica" style="text-align:center">
+	<h1>{{titulo}}</h1>
+	<div style="width:100%;height:500px" id="grafica">
+		
+	</div>
+</body>
+<script src="/static/js/canvas/html2canvas.min.js"></script>
+<script src="/static/js/canvas/html2canvas.svg.min.js"></script>
+<script src="/static/libs/jquery/jquery-1.11.1.min.js"></script>
+<script src="/static/libs/raphael/raphael-min.js"></script>
+<script src="/static/libs/morrischart/morris.min.js"></script>
+<script>
+	var data= {{diccionario|safe}};
+	$("#grafica").width(200*data.length);
+	$("h1").width(200*data.length);
+	Morris.Bar({
+	  element: 'grafica',
+	  resize: true,
+	  hideHover:'always',
+	  data: data,
+	  gridTextSize: 12,
+	  xkey: 'y',
+	  ykeys: ['a'],
+	  labels: ['Series A'],
+	  barColors: ['#209c84'],
+	});
+
+	$(window).load(function() {
+		/* Act on the event */
+		$("svg").height(700);
+		$("svg").attr("height","700");
+		html2canvas(document.getElementById("cuerpo_grafica"), {
+          onrendered: function(canvas) {
+          	var a = $("<a>")
+		    .attr("href", canvas.toDataURL())
+		    .attr("download", "")
+		    .appendTo("body");
+		    a[0].click();
+		    a.remove();
+            history.go(-1);
+          }
+        });
+
+		//window.print();
+	});
+
+</script>
+</html>

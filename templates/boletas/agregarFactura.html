@@ -1,0 +1,98 @@
+{% extends "layout.html" %}
+{% block titulo %}
+	Paso 3. Agregar Factura
+{% endblock titulo %}
+
+{% block contenido %}
+	<div class="page-heading" style="display: block;">
+		<h1><img src="/static/img/iconos/boletas.png" alt=""> Boletas</h1>
+		<h2>Paso 3 de 3</h2>
+		<h3>Registra la factura del almacén <b><i>{{almacen.nombre}}</i></b> del cliente <b><i>{{cliente.nombres}} {{cliente.apellidos}}</i></b> para la campaña <b><i>{{campania.nombre}}</i></b></h3>
+	</div>
+
+	<div class="alert alert-info" role="alert">
+		<strong>Para tener en cuenta: </strong> El valor definido de esta campaña para cada boleta es de <b><i>{{campania.valor_boleta}}</i></b>
+	</div>
+	{% if mensaje_exito %}
+	<div class="alert alert-success alert-dismissable">
+	    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	    {{mensaje_exito}} <a href="#" class="alert-link"></a>.
+	</div>
+	{% endif %}
+
+	{% if mensaje_error %}
+	<div class="alert alert-danger alert-dismissable">
+	    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	    {{mensaje_error}} <a href="#" class="alert-link"></a>.
+	</div>
+	{% endif %}
+
+	<form action="/boletas/almacenar-factura/" method="post" id="registerForm">
+		{% csrf_token %}
+		<input type="hidden" value="{{cliente.documento}}" name="cliente_hidden">
+		<input type="hidden" value="{{campania.identificador}}" name="campania_hidden">
+		<input type="hidden" value="{{almacen.identificador}}" name="almacen_hidden">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="widget">
+					<div class="widget-header">
+						<h2><strong>Registrar Compra</strong></h2>
+					</div>
+					<div class="widget-content padding">
+						<div class="row">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label>Fecha de compra</label>
+							  		<input autocomplete="off" type="text" name="fecha" class="form-control datepicker-input" placeholder="yyyy-mm-dd">
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label>Hora de compra</label>
+									<div class="input-append bootstrap-timepicker">
+							            <input name="hora" type="text" class="form-control timepicker">
+							        </div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-8">
+								<div class="form-group">
+									<label for="valor_boleta">Valor total de la Factura</label>
+									<input id="valor_boleta" autocomplete="off" type="text" name="valor_boleta" placeholder="Digíte la cantidad sin puntos ni caracteres especiales" class="form-control">
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<label for="valor"><b>Cantidad de Boletas que corresponden:</b></label><br>
+									<span id="cantidad_boletas" class="h2">0</span>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-12">
+								<input type="submit" value="Obtener boletas" class="btn btn-primary">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+	
+
+{% endblock contenido %}
+
+{% block js %}
+	<script type="text/javascript">
+		$("#boletas").addClass("active");
+		$("#valor_boleta").on('keyup', function(event) {
+    		var numero=0;
+    		var valor_boleta={{campania.valor_boleta}};
+    		numero= parseInt($(this).val(), 10);
+    		$("#cantidad_boletas").html(Math.floor(numero/valor_boleta));
+    	});
+	</script>
+	<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.min.js"></script>
+	<script src="/static/js/pages/form-validation.js"></script>
+{% endblock js %}

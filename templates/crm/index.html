@@ -1,0 +1,279 @@
+{% extends 'layout.html' %}
+{% load humanize %}
+{% block titulo %}Bievenido {{usuario}}{% endblock%}
+{% block css %}
+	<link href="/static/libs/morrischart/morris.css" rel="stylesheet" type="text/css" />
+{% endblock css %}
+{% block contenido %}
+	<div class="page-heading" style="display: block;">
+		<h1><img src="/static/img/iconos/home.png" alt=""> Inicio</h1>           	
+	</div>
+	{% if "campanias.add_campania" in objeto_usuario.get_all_permissions %}
+	<div class="row top-sumary">
+		<div class="col-sm-1"></div>
+		<a href="/reportes/por-clientes/" >
+			<div class="col-sm-6 col-md-offset-3" data-toggle="tooltip" data-original-title="Ver más sobre clientes" style="margin-right: 7px;">
+				<div class="row green">
+					<div class="col-sm-12 home-clientes">
+						<i class="fa fa-suitcase"></i> <span style="font-size:25px">Clientes</span>
+					</div>
+				</div>
+				<div class="row gris home-clientes-numero">
+					<div class="col-sm-7">
+						No. de clientes 
+					</div>
+					<div class="col-sm-5 center">
+						<span>{{clientes|length|intcomma}}</span>
+					</div>
+				</div>
+				<div class="row gris home-clientes-numero">
+					<div class="col-sm-12 center">
+						Género vs Edades
+						<hr>
+					</div>
+					<div class="col-sm-12 estadistica center">
+						<label>Construyendo reporte, favor espera ...</label>
+						<div class="progress no-rounded progress-striped active">
+						  <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
+							<span class="sr-only">20% Complete (warning)</span>
+						  </div><!-- .progress-bar .progress-bar-warning -->
+						</div>
+						<hr>
+					</div>
+					<div class="col-sm-12">
+						<div class="col-sm-6 center">
+							<img src="/static/img/iconos/icon-female.png" alt=""><br>
+							<span class="procentaje_mujeres"></span>
+						</div>
+						<div class="col-sm-6 center">
+							<img src="/static/img/iconos/icon-male.png" alt=""><br>
+							<span style="color:#A7D764" class="procentaje_hombres"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</a>
+	</div>
+	<br>
+	<hr>
+	<br>
+	{% endif %}
+	{# Campanias #}
+	<!-- LISTA DE CAMPAÑAS ACTIVAS -->
+	<div class="row">
+		<div class="col-sm-1"></div>
+	{% for c in campanias_activas %}
+		<a href="/campanias/ver_campania/?id={{c.id}}">
+    <div class="col-sm-5" style="{% cycle '' 'margin-left:7px' %}">
+      <div data-toggle="tooltip" data-original-title="Ver más sobre esta campaña">
+      <div class="row gris home-campanias-imagen" style="background-image: url(/static/img/campanias.jpg);"></div>
+      <div class="row home-campanias verde center">
+        <i class="fa fa-bullhorn"></i> {{c.nombre}}
+      </div>
+      <div class="row home-campanias-info gris">
+        <div class="col-sm-12">
+          <p>VALOR BOLETA: <span class="">${{c.valor_boleta|intcomma}}</span></p>
+        </div>
+        <div class="col-sm-12">
+          <p>NÚMERO BOLETAS: <span class="">{{c.numero_boletas|intcomma}}</span></p>
+        </div>
+        <div class="col-sm-12">
+          <p>TOTAL RECAUDADO: <span class="">${{c.recaudado|intcomma}}</span></p>
+        </div>
+      </div>
+      </div>
+    </div>
+  </a>
+  {% cycle  "" "</div><br><div class='row'><div class='col-sm-1'></div>" %}
+	{% endfor %}
+	</div><!--Se cierra-->
+	</div><br><div class='row'><div class='col-sm-1'></div>
+
+{% endblock contenido %}
+{% block js %}
+	<script>
+		$("#inicio").addClass("active");
+	</script>
+	{% if "campanias.add_campania" in objeto_usuario.get_all_permissions %}
+	<script src="/static/libs/raphael/raphael-min.js"></script>
+	<script src="/static/libs/morrischart/morris.min.js"></script>
+	<script>
+		var edades=[{
+				"inicio":13,
+				"fin":17,
+				"resultados":{
+								"hombre":0,
+								"mujer":0,
+							},
+				"porcentaje":{
+								"hombre":0,
+								"mujer":0,
+							},
+				},
+				{
+				"inicio":18,
+				"fin":24,
+				"resultados":{
+								"hombre":0,
+								"mujer":0,
+							},
+				"porcentaje":{
+								"hombre":0,
+								"mujer":0,
+							},
+				},
+				{
+				"inicio":25,
+				"fin":34,
+				"resultados":{
+								"hombre":0,
+								"mujer":0,
+							},
+				"porcentaje":{
+								"hombre":0,
+								"mujer":0,
+							},
+				},
+				{
+				"inicio":35,
+				"fin":44,
+				"resultados":{
+								"hombre":0,
+								"mujer":0,
+							},
+				"porcentaje":{
+								"hombre":0,
+								"mujer":0,
+							},
+				},
+				{
+				"inicio":45,
+				"fin":55,
+				"resultados":{
+								"hombre":0,
+								"mujer":0,
+							},
+				"porcentaje":{
+								"hombre":0,
+								"mujer":0,
+							},
+				},
+				{
+				"inicio":55,
+				"fin":150,
+				"resultados":{
+								"hombre":0,
+								"mujer":0,
+							},
+				"porcentaje":{
+								"hombre":0,
+								"mujer":0,
+							},
+				},
+			];
+		
+			var clientes=[
+				{% for c in clientes %}
+					{
+						"cliente":'{{c.documento}}',
+						"genero":{% if c.genero %}"hombre"{% else %}"mujer"{% endif %},
+						"edad":{{c.get_edad}}
+					},
+				{% endfor %}
+			];
+		function generarReporteGeneroEdades () {
+			for (var i = 0; i < clientes.length; i++) {
+				for (var j = 0; j < edades.length; j++) {
+					if(clientes[i]['edad']>=edades[j]['inicio'] && clientes[i]['edad']<=edades[j]['fin']){
+						if(clientes[i]['genero']=="hombre"){
+							edades[j]['resultados']['hombre']+=1;
+						}else{
+							edades[j]['resultados']['mujer']+=1;
+						}
+						j=edades.length;
+					}
+				};	
+			};
+			generarPorcentaje();
+		}
+
+		function generarPorcentaje () {
+			var hombres_global=0;
+			var mujeres_global=0;
+
+			for (var i = 0; i < edades.length; i++) {
+				var hombre= edades[i]['resultados']['hombre'];
+				var mujer= edades[i]['resultados']['mujer'];
+				var total= hombre+mujer;
+				// Calculamos el pocentaje
+				if(total>0){
+					edades[i]['porcentaje']['hombre']= (100*hombre)/total;
+					edades[i]['porcentaje']['mujer']= (100*mujer)/total;
+					// Se calcula el porcentaje global
+					hombres_global+=hombre;
+					mujeres_global+=mujer;	
+				}
+			};
+
+			$(".procentaje_hombres").html((Number((100*hombres_global)/clientes.length).toFixed(2))+"%");
+			$(".procentaje_mujeres").html((Number((100*mujeres_global)/clientes.length).toFixed(2))+"%");
+
+			$.ajax({
+				url: '/crm/generar_reporte_clientes/',
+				type: 'GET',
+				dataType: 'html',
+				data: {diccionario: JSON.stringify(edades)},
+				success:function (data) {
+					$(".estadistica").html(data);
+				}
+			});
+		}
+		generarReporteGeneroEdades ();
+		var evolucionCampanias=[]
+		// Campañas
+		var temporal={
+		{% for r in evolucionCampanias %}
+			{{r.mes}}:{{r.valor}},	
+		{% endfor %}
+		};
+
+		var valor_recaudado=0
+
+		for (var i = 1; i < (new Date().getMonth())+2; i++) {
+			if(temporal[i.toString()]==undefined){
+				evolucionCampanias.push({y:'2015-'+i+'-01',a:0});
+			}else{
+				evolucionCampanias.push({y:'2015-'+i+'-01',a:temporal[i]});
+				valor_recaudado+=temporal[i];
+			}
+		};
+
+		$("#anio_actual").html(new Date().getFullYear());
+
+		$("#total_recaudado").html("$"+valor_recaudado.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+
+		var meses= ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+		jQuery(document).ready(function($) {
+			Morris.Line({
+			  element: 'campania_line',
+			  resize: true,
+			  hideHover:true,
+			  data: evolucionCampanias,
+			  xkey: 'y',
+			  ykeys: 'a',
+			  labels: ['Ventas'],
+			  xLabels:"month",
+			  lineColors:["#ec1b5c"],
+			  dateFormat: function (x) {
+			  	return meses[new Date(x).getMonth()];
+			  },
+			  xLabelFormat: function (x) {
+			  	return meses[new Date(x).getMonth()].substr(0,3);
+			  },
+			});
+		});
+		
+	</script>
+	{% endif %}
+{% endblock %}

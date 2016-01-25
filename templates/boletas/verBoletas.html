@@ -1,0 +1,122 @@
+{% extends 'layout.html' %}
+{% block titulo %}Boletas registradas{% endblock %}
+{% block css %}
+<!-- Extra CSS Libraries Start -->
+<link href="/static/libs/jquery-datatables/css/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/jquery-datatables/extensions/TableTools/css/dataTables.tableTools.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/style.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/jquery-notifyjs/styles/metro/notify-metro.css" rel="stylesheet" type="text/css" />
+<!-- Extra CSS Libraries End -->
+{% endblock %}
+{% block contenido %}
+<div class="page-heading" style="display: block;">
+	<h1><img src="/static/img/iconos/boletas.png" alt=""> Boletas</h1>
+	<h3>Boletas actualmente registradas</h3>            	
+</div>
+{% if mensaje_exito %}
+<div class="alert alert-success alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_exito}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+
+{% if mensaje_error %}
+<div class="alert alert-danger alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_error}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+<div class="row">
+	<div class="col-md-12">
+		<div class="widget">
+			<div class="widget-header">
+				<h2>Lista de Boletas</h2>
+				<div class="additional-btn">
+					<a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+					<a href="#" class="widget-close"><i class="icon-cancel-3"></i></a>
+				</div>
+			</div>
+			<div class="widget-content">
+			<br>					
+				<div class="table-responsive">
+					<form class='form-horizontal' role='form'>
+					<table id="datatables-2" class="table table-striped table-bordered" cellspacing="0" width="100%">
+					        <thead>
+					            <tr>
+					            	<th>Cliente</th>
+					                <th>Campaña</th>
+					                <th>Almacén</th>
+					                <th>Fecha</th>
+					                <th>Valor Compra</th>
+					                <th>Opciones</th>
+					            </tr>
+					        </thead>
+					 
+					 
+					        <tbody>
+					        	{% for b in boletas %}
+					        		<tr>
+					        			<td>{{b.cliente.nombres}} {{b.cliente.apellidos}}</td>
+						        		<td>{{b.campania.nombre}}</td>
+						        		<td>{{b.almacen.nombre}}</td>
+						        		<td>{{b.fecha.isoformat|slice:'10'}}</td>
+						        		<td>{{b.valor_factura}}</td>
+						        		<td>
+						        			<div class="btn-group btn-group-xs">
+													<a href="/boletas/ver-boleta/?id={{b.identificador}}" data-toggle="tooltip" title="" class="btn btn-default" data-original-title="Ver Información"><i class="fa fa-eye"></i></a>
+												</div>
+						        		</td>
+					        		</tr>
+					        	{% endfor %}
+					        </tbody>
+					    </table>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block ajax %}
+<script type="text/javascript">
+	function desactivarAlmacen(id_almacen) {
+		$.ajax({
+			url: '/almacenes/desactivar-almacen/',
+			type: 'get',
+			data: {'id_almacen': id_almacen},
+			success:function (data) {
+				if(data=='Activo'){
+					$("#"+id_almacen+"_label").removeClass('label-danger');
+					$("#"+id_almacen+"_label").addClass('label-success');
+					$("#"+id_almacen+"_link_desactivar").fadeIn();
+					$("#"+id_almacen+"_link_activar").fadeOut();
+				}else{
+					$("#"+id_almacen+"_label").removeClass('label-success');
+					$("#"+id_almacen+"_label").addClass('label-danger');
+					$("#"+id_almacen+"_link_activar").fadeIn();
+					$("#"+id_almacen+"_link_desactivar").fadeOut();
+				}
+				$("#"+id_almacen+"_label").html(data);
+				autohidenotify('success');
+			},
+			error:function (data) {
+				autohidenotify('error');
+			}
+		});
+		
+	}
+</script>
+{% endblock %}
+{% block js %}
+<script>
+	$("#ver_boletas").addClass("active");
+</script>
+<!-- Page Specific JS Libraries -->
+<script src="/static/libs/jquery-datatables/js/jquery.dataTables.min.js"></script>
+<script src="/static/libs/jquery-datatables/js/dataTables.bootstrap.js"></script>
+<script src="/static/libs/jquery-datatables/extensions/TableTools/js/dataTables.tableTools.min.js"></script>
+<script src="/static/js/pages/datatables.js"></script>
+<script src="/static/libs/jquery-notifyjs/notify.min.js"></script>
+<script src="/static/libs/jquery-notifyjs/styles/metro/notify-metro.js"></script>
+<script src="/static/js/pages/notifications.js"></script>
+{% endblock %}

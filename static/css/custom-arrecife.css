@@ -1,0 +1,320 @@
+/** PALLETE COLORS **/
+/*
+	@blue-400: #6AB2E2;
+	@blue-500: #3864AA;
+	@green-500: #A7D764;
+	@orange-500: #FA8D29;
+	@orange-100: #F7ECDF;
+	@brown-500: #8E5E10;
+	@gray-300: #EAEAEA;
+
+*/
+/*Barra superior*/
+body{
+	font-family: 'Roboto', sans-serif;
+}
+
+.content .page-heading h2{
+	color: #A7D764;
+	font-weight: 400;
+}
+
+.topbar, .btn-success{
+	background: #3864AA;
+	height: 100px;
+}
+.topbar .topbar-left{
+	height: 100px;
+}
+.logo h1{
+	height: 100px;
+}
+.logo h1 img{
+	height: 100%;
+}
+.navbar-nav{
+	padding-top: 25px;
+}
+.topbar-profile .topbar-profile-image{
+	border: 2px solid #3864AA;
+	box-shadow: 0px 0px 0px 1px #6AB2E2;
+    margin-bottom: -18px;
+    width: 50px;
+}
+
+.side-menu.left{
+	top: 100px;
+}
+/*Circunferencia imagen de usuario*/
+.profile-image{
+	border: 2px solid #FFFFFF;
+	box-shadow: 0px 0px 0px 2px #FA8D29;
+}
+.button-menu-mobile{
+	color: #3864AA;
+	font-size: 30px;
+	padding: 10px 12px;
+}
+
+.navbar-nav > li.topbar-profile > .dropdown-menu, .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus{
+	background-color: #3864AA;
+}
+.navbar-nav > li.topbar-profile > .dropdown-menu{
+	box-shadow: 0px 0px 2px #FFFFFF;
+}
+.navbar-nav > li.topbar-profile > .dropdown-menu:before{
+	border-bottom-color: #FFFFFF;
+}
+
+#sidebar-menu > ul > li{
+	background-color: #6AB2E2;
+}
+#sidebar-menu > ul > li > a{
+	font-size: 17px;
+	padding: 15px 10px;
+}
+#sidebar-menu > ul > li > a:hover, #sidebar-menu > ul > li > a.subdrop, #wrapper.enlarged .left.side-menu #sidebar-menu ul > li:hover > a{
+	background: #FA8D29;
+	color: #FFFFFF;
+}
+#sidebar-menu > ul > li > a > i{
+	font-size: 17px;
+}
+#sidebar-menu > ul > li > a, #sidebar-menu > ul > li > a > i{
+	color: #FFFFFF;
+	font-weight: 300;
+}
+/*Menu activo*/
+#sidebar-menu > ul > li > a.active, #sidebar-menu > ul > li > a.active.subdrop{
+	background: #FA8D29 !important;
+	font-weight: 400;
+}
+/*Submenu inactivo*/
+#sidebar-menu ul ul a{
+	background: #F7ECDF;
+	color: #8E5E10;
+}
+#sidebar-menu ul ul li a.active{
+    background: #dedede;
+	color: #222;
+}
+
+.label.label-success{
+	background: #FA8D29;
+	padding: 0.3em 2em;
+}
+.label.label-danger{
+	background: #BBBBBB;
+	padding: 0.3em 2em;
+}
+
+.content-page > .content{
+	margin-top: 100px;
+}
+
+.widget .widget-header h2{
+	color: #A3A09D;
+}
+
+.widget{
+	color: #A3A09D;
+}
+
+.progress-bar-success{
+	background-color: #A7D764;
+}
+.progress-bar-danger{
+	background-color: #FA8D29;
+}
+.progress-bar__active{
+	background-color: #FA8D29;
+}
+.progress-bar__deactive{
+	background-color: #CCCCCC;
+}
+
+
+.estadistica{
+	font-size: 16px;
+}
+
+.progress{
+	height: 16px;
+  	margin-bottom: 2px; 
+}
+
+.home-clientes{
+	color: #fff;
+	font-size:30px;
+	text-align:center;
+}
+
+.home-campanias{
+	margin-top: 7px;
+	color: #fff;
+	font-size:25px;
+	text-align: left;
+	padding: 7px;
+}
+
+.home-campanias-info{
+	margin-top: 7px;
+	color: #a39f9c;
+	font-size:15px;
+	text-align: left;
+	padding: 7px;
+}
+
+.home-campanias-info span{
+	font-size: 18px;
+}
+
+.home-campanias-info p{
+	margin-top: 10px;
+}
+
+/*Menu izquierdo que contiene el logo*/
+.topbar .topbar-left{
+	background: #fff;
+}
+
+h1, h2, h3, h4, h5, h6{
+	color: rgb(163,159,156);
+}
+
+.rojo{
+	background-color: #A7D764;
+}
+.gris{
+	background: #eaeaea;
+}
+
+.verde{
+	background: #A7D764;
+}
+.green{
+	background-color: #A7D764;
+}
+
+.center{
+	text-align: center
+}
+
+.home-clientes-numero{
+	margin-top: 10px
+}
+
+.home-campanias-imagen{
+	background-position: center;
+	background-size: cover;
+	height: 100px;
+}
+
+.home-clientes-numero{
+	color: #a39f9c;
+	font-size:25px;
+	text-align: left;
+	padding: 7px;
+}
+
+.home-clientes-numero span{
+	text-align: center;
+	font-weight: bold;
+	color: #FA8D29;
+}
+
+
+/*Tablas */
+
+.widget table tr th, .widget table tr td, .table-bordered{
+	border: 2px solid #fff;
+}
+
+.widget .table tbody tr td{
+	background: #eaeaea;
+}
+
+.widget .table thead tr th{
+	background-color: #fff;
+	color: #a4a19e;
+}
+
+table.table thead .sorting{
+	background-color: #fff;
+}
+
+/* Calendario  */
+
+table.fc-border-separate, .fc-border-separate tbody tr.fc-first td, .fc-border-separate tbody tr.fc-first th {
+	background-color: #eaeaea;
+	color: #a39f9c;
+	font-weight: bold;
+}
+
+.fc-border-separate tbody tr.fc-first .fc-other-month, .fc-border-separate tbody tr.fc-last .fc-other-month {
+	background-color: #F4F3F2;
+}
+
+.fc-state-default{
+	background-image: none;
+	background-color: #999999;	
+	color: #fff;
+	text-transform: capitalize;
+}
+
+.fc-header-right .fc-state-default{
+	background-color: #CCC;	
+}
+
+.fc-header .fc-state-active, .fc-header .ui-state-active{
+	background-color: #a39f9c;
+}
+
+.fc-header-right .fc-state-default{
+	margin-left: 6px;
+	border-radius: 5px;
+}
+
+.fc-header-title h2{
+	font-size: 19px;
+}
+
+/* Campanias */
+
+.titulo-campania{
+	background-color: #A7D764;
+	color: #fff;
+	font-size: 25px;
+	padding: 5px;
+	padding-left:15px;
+}
+
+.numero-boletas-campania{
+	background-color: #eaeaea;
+	color: #A3A09D;
+	font-size: 16px;
+	padding: 12px;
+}
+.link-continuar-boleta{
+	font-size: 16px;
+	text-align:right;
+	margin-top: 5px;
+}
+
+.link-continuar-boleta a{
+	color: #A3A09D;
+}
+
+.link-continuar-boleta span{
+	color: #A7D764;
+	font-weight: bold;
+}
+
+.login-page{
+	background:#f3f3f3
+}
+
+.alert-info{
+	background-color: #A7D764;
+	color: #FFFFFF;
+}

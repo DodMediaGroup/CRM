@@ -1,0 +1,747 @@
+{% extends 'layout.html' %}
+{% block titulo %}Reportes Generales{% endblock%}
+{% block css %}
+<!-- Extra CSS Libraries Start -->
+<link href="/static/libs/jquery-datatables/css/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/jquery-datatables/extensions/TableTools/css/dataTables.tableTools.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/style.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/jquery-notifyjs/styles/metro/notify-metro.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/morrischart/morris.css" rel="stylesheet" type="text/css" />
+<!-- Extra CSS Libraries End -->
+{% endblock %}
+{% block contenido %}
+	<div class="page-heading" style="display: block;">
+		<h1><img src="/static/img/iconos/reportes.png" alt=""> Reportes Generales</h1>
+		<h3>El administrador podrá visualizar y exportar información luego de señalar el periodo de tiempo que desea.</h3>           	
+	</div>
+	{% if mensaje_exito %}
+	<div class="alert alert-success alert-dismissable">
+	    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	    {{mensaje_exito}} <a href="#" class="alert-link"></a>.
+	</div>
+	{% endif %}
+
+	{% if mensaje_error %}
+	<div class="alert alert-danger alert-dismissable">
+	    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	    {{mensaje_error}} <a href="#" class="alert-link"></a>.
+	</div>
+	{% endif %}
+
+	<div class="row">
+		<div class="col-md-12">
+			<div class="widget">
+				<div class="widget-header">
+					<h2><strong>Almacenes por ventas</strong></h2>
+					<div class="additional-btn">
+						<a href="#" class="widget-maximize hidden"><i class="icon-resize-full-1"></i></a>
+						<a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+					</div>
+				</div>
+				<div class="widget-content padding">
+					<p>A continuación puedes seleccionar un rango de fechas en las que prodrás visualizar, ya sea el almacén que más vendió o la categoría que más ventas realizó en ese intervalo de tiempo</p>
+					<div class="row">
+						<div class="col-sm-3">
+							<label >Fecha Inicio</label>
+							<input id="fecha_inicio_almacen" type="text" class="form-control datepicker-input fecha_inicio" placeholder="mm/dd/yyyy" >
+						</div>
+						<div class="col-sm-3">
+							<label >Fecha Fin</label>
+							<input id="fecha_fin_almacen" type="text" class="form-control datepicker-input fecha_fin" placeholder="mm/dd/yyyy" >
+						</div>
+						<div class="col-sm-3">
+							<label >Tipo Filtro</label>
+							<select name="filtro-almacen" id="filtro-almacen" class="form-control">
+								<option value="">-- Seleccione Filtro --</option>
+								<option value="0">Filtrar por Almacenes</option>
+								<option value="1">Filtrar por Categorías</option>
+							</select>
+						</div>
+						<div class="col-sm-3">
+							<br>
+							<a id="buscar-ventas" class="btn btn-primary"><i class="fa fa-search"></i> Buscar ventas</a>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-sm-12">
+							<div id="respuesta-almacen-grafica">
+							</div>
+							<div id="respuesta-almacen">
+							</div>
+						</div>
+					</div>			
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{# Reporte para los clientes por ventas  #}
+	<div class="row">
+		<div class="col-md-12">
+			<div class="widget">
+				<div class="widget-header">
+					<h2><strong>Clientes por compras</strong></h2>
+					<div class="additional-btn">
+						<a href="#" class="widget-maximize hidden"><i class="icon-resize-full-1"></i></a>
+						<a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+					</div>
+				</div>
+				<div class="widget-content padding">
+					<p>A continuación puedes seleccionar un rango de fechas en las que prodrás visualizar el cliente que realizó las mayores compras</p>
+					<div class="row">
+						<div class="col-sm-4">
+							<label >Fecha Inicio</label>
+							<input id="fecha_inicio_cliente" type="text" class="form-control datepicker-input fecha_inicio" placeholder="mm/dd/yyyy">
+						</div>
+						<div class="col-sm-4">
+							<label >Fecha Fin</label>
+							<input id="fecha_fin_cliente" type="text" class="form-control datepicker-input fecha_fin" placeholder="mm/dd/yyyy">
+						</div>
+						<div class="col-sm-4">
+							<br>
+							<a id="buscar-cliente" class="btn btn-primary"><i class="fa fa-search"></i> Buscar Compras</a>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-sm-12">
+							<div id="respuesta-cliente-grafica">
+							</div>
+							<div id="respuesta-cliente">
+							</div>
+						</div>
+					</div>			
+				</div>
+			</div>
+		</div>
+	</div>
+	{# Fin reporte clientes #}
+	{# Reporte por dias de la semana #}
+	<div class="row">
+		<div class="col-md-12">
+			<div class="widget">
+				<div class="widget-header">
+					<h2><strong>Ranking de ventas por día de la semana</strong></h2>
+					<div class="additional-btn">
+						<a href="#" class="widget-maximize hidden"><i class="icon-resize-full-1"></i></a>
+						<a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+					</div>
+				</div>
+				<div class="widget-content padding">
+					<p>A continuación puedes seleccionar un rango de fechas en las que prodrás visualizar los días de la semaan y las horas en que se realizaron las vnetas</p>
+					<div class="row">
+						<div class="col-sm-4">
+							<label >Fecha Inicio</label>
+							<input id="fecha_inicio_dias" type="text" class="form-control datepicker-input fecha_inicio" placeholder="mm/dd/yyyy">
+						</div>
+						<div class="col-sm-4">
+							<label >Fecha Fin</label>
+							<input id="fecha_fin_dias" type="text" class="form-control datepicker-input fecha_fin" placeholder="mm/dd/yyyy">
+						</div>
+						<div class="col-sm-4">
+							<br>
+							<a id="buscar-dias" class="btn btn-primary"><i class="fa fa-search"></i> Buscar Compras</a>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-sm-12" id="reporte_total_dias">
+							<div class="row titulo_ranking_dias" style="text-align:center;display:none">
+								<h1>Ranking de ventas por día de la semana entre <span id="fecha_1_dias"></span> y <span id="fecha_2_dias"></span></h1>
+							</div>
+							<div id="convencion_dias">
+								<div class="row">
+									<div class="col-xs-2">
+										<div class="col-xs-8">Color 1</div>
+										<div class="col-xs-4">
+											<div id="color1"></div>
+										</div>
+									</div>
+									<div class="col-xs-2">
+										<div class="col-xs-8">Color 2</div>
+										<div class="col-xs-4">
+											<div id="color2"></div>
+										</div>
+									</div>
+									<div class="col-xs-2">
+										<div class="col-xs-8">Color 3</div>
+										<div class="col-xs-4">
+											<div id="color3"></div>
+										</div>
+									</div>
+									<div class="col-xs-2">
+										<div class="col-xs-8">Color 4</div>
+										<div class="col-xs-4">
+											<div id="color4"></div>
+										</div>
+									</div>
+									<div class="col-xs-2">
+										<div class="col-xs-8">Color 5</div>
+										<div class="col-xs-4">
+											<div id="color5"></div>
+										</div>
+									</div>
+									<div class="col-xs-2">
+										<div class="col-xs-8">Color 6</div>
+										<div class="col-xs-4">
+											<div id="color6"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div id="respuesta-dias">
+
+							</div>
+							<br>
+							
+						</div>
+						<div id="btn-imprimir-dias" style='text-align:center;display:none'><a target="_blank" class='btn btn-primary' id="desc_img_dias"><i class='fa fa-download'></i> <span>Preparar para descarga</span></a></div>
+					</div>			
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<form action="/reportes/exportar-excel/" method="post" id="exportar_excel">
+		{% csrf_token %}
+		<input type="hidden" value="" name="datos">
+	</form>
+
+	<form action="/reportes/imprimir-grafica/" method="post" id="imprimir_grafica">
+		{% csrf_token %}
+		<input type="hidden" value="" name="titulo">
+		<input type="hidden" value="" name="datos">
+	</form>
+	
+	<div id="impresion" style="display:none">
+		<h1></h1>
+	</div>
+	{# Fin reportes por dias #}
+{% endblock contenido %}
+{% block js %}
+	<script src="/static/js/canvas/html2canvas.min.js"></script>
+    <script src="/static/js/canvas/html2canvas.svg.min.js"></script>
+	<script src="/static/libs/raphael/raphael-min.js"></script>
+	<script src="/static/libs/morrischart/morris.min.js"></script>
+	<script type="text/javascript">
+		$("#reportes_generales").addClass("active");
+
+		function agregarDataTable (id,col_order) {
+			$(id).DataTable(
+		        {"language": {
+		            "emptyTable":     "No hay registros",
+		            "info":           "Mostrando _START_ a _END_ de _TOTAL_ registros",
+		            "infoEmpty":      "Mostrando 0 a 0 de 0 registros",
+		            "infoFiltered":   "(Filtrado de _MAX_ de los registros totales)",
+		            "infoPostFix":    "",
+		            "thousands":      ",",
+		            "lengthMenu":     "Mostrando _MENU_ registros",
+		            "loadingRecords": "Cargando...",
+		            "processing":     "Procesando...",
+		            "search":         "Buscar:",
+		            "zeroRecords":    "No se encontraron resultados",
+		            "paginate": {
+		                "first":      "Primero",
+		                "last":       "Último",
+		                "next":       "Siguiente",
+		                "previous":   "Anterior"
+		            },
+		            "aria": {
+		                "sortAscending":  ": activate to sort column ascending",
+		                "sortDescending": ": activate to sort column descending"
+		            }
+		        },
+		        "order":[[ col_order ,"desc"]]
+		    }
+		    );
+		}
+		// Variable para tener almacenados los datos del siguiente reporte
+		var reporte_almacenes;
+		// Esta funcion se utiliza para generar el reporte de los almacenes de acuerdo a un rango de fecha establecido
+		$("#buscar-ventas").on('click', function(event) {
+			$("#respuesta-almacen-grafica").html("");
+			$("#respuesta-almacen-grafica").css('height', '0px');
+			// Se valida que se hayan completado todos los campos
+			if($("#fecha_inicio_almacen").val()!="" && $("#fecha_fin_almacen").val()!="" && $("#filtro-almacen").val()!=""){
+				var fecha_inicio= $("#fecha_inicio_almacen").val().split("/");
+				var fecha_fin= $("#fecha_fin_almacen").val().split("/");
+				// Se convierte el string que llega a un formato valido de fecha para su posterior evaluacion
+				var inicio= new Date(fecha_inicio[2],(parseInt(fecha_inicio[0], 10)-1),fecha_inicio[1]);
+				var fin= new Date(fecha_fin[2],(parseInt(fecha_fin[0], 10)-1),fecha_fin[1]);
+				var hoy = new Date();
+				var contador=0;
+				// Se valida que la fecha inicio sea valida
+				if(isNaN(inicio)){
+					$("#respuesta-almacen").html('<div class="alert alert-danger" role="alert">El formato de <b>fecha inicio</b> no es valido</div>');	
+					contador++;
+				}
+				// Se Valida que la fecha fin sea valida
+				if(isNaN(fin)){
+					$("#respuesta-almacen").html('<div class="alert alert-danger" role="alert">El formato de <b>fecha fin</b> no es valido</div>');	
+					contador++;
+				}
+				if(contador==0 && (inicio<=fin)){
+					// Una vez todo validado generamos un informe de estado al usuario en caso de que la operación se demore mucho
+					var barra= '<label>Procesando tu solicitud. Favor espera ...</label>';
+					barra+= '<div class="progress no-rounded progress-striped active">';
+					barra+= '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">';
+					barra+= '<span class="sr-only">40% Complete (success)</span>';
+					barra+= '</div></div>';
+					$("#respuesta-almacen").html(barra);
+					// Realizamos la petición ajax
+					$.ajax({
+						url: '/reportes/reporte-almacen/',
+						type: 'get',
+						dataType: 'json',
+						data: {'tipo_filtro': $("#filtro-almacen").val(), 
+						'fecha_inicio': $("#fecha_inicio_almacen").val().split("/")[2]+'-'+$("#fecha_inicio_almacen").val().split("/")[0]+'-'+$("#fecha_inicio_almacen").val().split("/")[1], 
+						'fecha_fin': $("#fecha_fin_almacen").val().split("/")[2]+'-'+$("#fecha_fin_almacen").val().split("/")[0]+'-'+$("#fecha_fin_almacen").val().split("/")[1],
+						},
+						success: function (data) {
+							reporte_almacenes= data;
+							// Construimos la tabla para mostrar los resultados
+							var html= '<div class="table-responsive">';
+								html+='	<table id="datatable-almacen-categorias" class="table table-striped table-bordered" cellspacing="0" width="100%">';
+								html+='		<thead>';
+							if($("#filtro-almacen").val()=="0"){
+								// Almacenes
+								html+='			<tr>';
+								html+='				<th>Nombre del Almacén</th>';
+								html+='				<th>Número de ventas</th>';
+								html+='				<th>Valor total ventas</th>';
+								html+='			</tr>';
+							}else{
+								// Categorías
+								html+='			<tr>';
+								html+='				<th>Nombre de la Categoría</th>';
+								html+='				<th>Número de ventas</th>';
+								html+='				<th>Valor total ventas</th>';
+								html+='			</tr>';
+							}
+								html+='		</thead>';
+								html+='		<tbody>';
+							for (var i = 0; i < data.length; i++) {
+								html+='			<tr>';
+								html+='				<td>'+data[i].nombre+'</td>';
+								html+='				<td>'+data[i].numero_ventas+'</td>';
+								html+='				<td><u><b>$ '+data[i].valor+'</b></u></td>';
+								html+='			</tr>';
+							};
+								html+='		</tbody>';
+								html+='	</table>';
+								html+='</div>';
+								// Agregamos botones de exportar
+								html+='<br><div style="text-align:center">';
+								html+='<a target="_blank" href="';
+								// Agregamos la url para exportar
+								var datos_envio= 'tipo_filtro='+$("#filtro-almacen").val()+'&fecha_inicio='+$("#fecha_inicio_almacen").val().split("/")[2]+'-'+$("#fecha_inicio_almacen").val().split("/")[0]+'-'+$("#fecha_inicio_almacen").val().split("/")[1]+'&fecha_fin='+$("#fecha_fin_almacen").val().split("/")[2]+'-'+$("#fecha_fin_almacen").val().split("/")[0]+'-'+$("#fecha_fin_almacen").val().split("/")[1];
+								if($("#filtro-almacen").val()=="0"){
+									html+='/reportes/generar-reporte-almacen-pdf/?'+datos_envio;
+								}else{
+									html+='/reportes/generar-reporte-categoria-pdf/?'+datos_envio;
+								}
+								html+='" class="btn btn-primary"><i class="fa fa-print"></i> Imprimir</a> <a id="graficar_almacenes" class="btn btn-primary"><i class="fa fa-bar-chart"></i> Graficar</a>';
+								html+=' <a class="btn btn-primary exportar_excel" data-tabla="datatable-almacen-categorias"><i class="fa fa-external-link"></i> Exportar Excel</a>';
+								html+='</div>';
+							$("#respuesta-almacen").html(html);
+							agregarDataTable("#datatable-almacen-categorias",2);
+							console.log(data);
+						},
+						error: function (data) {
+							$("#respuesta-almacen").html('<div class="alert alert-danger" role="alert">No se puede procesar tu solicitud. Favor intenta más tarde</div>');	
+						}
+					});
+				}else{
+					$("#respuesta-almacen").html('<div class="alert alert-warning" role="alert">Recuerda que <b>fecha inicio</b> debe ser menor o igual a <b>fecha fin</b></div>');	
+				}
+			}else{
+				$("#respuesta-almacen").html('<div class="alert alert-warning" role="alert">Favor Complete todos los campos</div>');
+			}
+		});
+
+		// Esta función grafica los resultados del reporte almacen/categorias vs ventas 
+		$("body").on('click', '#graficar_almacenes', function(event) {
+			// Construimos el diccionario para poder graficar los datos
+			var data= [];
+			var longitud= 9;
+            if(reporte_almacenes.length<longitud){
+                longitud=reporte_almacenes.length;
+            }
+            for (var i = 0; i < longitud; i++) {
+                data.push({ y: reporte_almacenes[i].nombre, a: reporte_almacenes[i].valor });
+            };
+			// Construimos la gráfica
+			$("#respuesta-almacen").html("");
+			$("#respuesta-almacen-grafica").css('height', '300px');
+			Morris.Bar({
+			  element: 'respuesta-almacen-grafica',
+			  resize: true,
+			  data: data,
+			  xkey: 'y',
+			  ykeys: ['a'],
+			  labels: ['Series A'],
+			  barColors: ['#209c84'],
+			});
+			$("#respuesta-almacen-grafica").css("height","auto");
+			var tipo="";
+			if ($("select[name=filtro-almacen]").val()=="0") {
+				tipo="Almacenes";
+			}else{
+				tipo="Categorías";
+			}
+			$("#respuesta-almacen-grafica").append("<div style='text-align:center'><a class='btn btn-primary limpiar'><i class='fa fa-trash'></i> Limpiar</a> <a data-titulo='"+tipo+" Vs Ventas entre "+$("#fecha_inicio_almacen").val()+" y "+$("#fecha_fin_almacen").val()+"' class='btn btn-primary imprimir_grafica'><i class='fa fa-download'></i> Descargar Gráfica</a></div>");
+		});
+
+		$("body").on('click', '.imprimir_grafica', function(event) {
+			var data= [];
+			var titulo=$(this).attr('data-titulo');
+			var longitud= 9;
+            if(reporte_almacenes.length<longitud){
+                longitud=reporte_almacenes.length;
+            }
+            for (var i = 0; i < longitud; i++) {
+                data.push({ y: reporte_almacenes[i].nombre.replace(/ /g,"\n"), a: reporte_almacenes[i].valor });
+            };
+			$("#imprimir_grafica input[name=datos]").val(JSON.stringify(data));
+			$("#imprimir_grafica input[name=titulo]").val(titulo);
+			$("#imprimir_grafica").submit();
+		});
+
+		// Esta funcion se utiliza para generar el reporte de los clientes
+		$("#buscar-cliente").on('click', function(event) {
+			$("#respuesta-cliente-grafica").html("");
+			$("#respuesta-cliente-grafica").css('height', '0px');
+			// Se valida que se hayan completado todos los campos
+			if($("#fecha_inicio_cliente").val()!="" && $("#fecha_fin_cliente").val()!=""){
+				var fecha_inicio= $("#fecha_inicio_cliente").val().split("/");
+				var fecha_fin= $("#fecha_fin_cliente").val().split("/");
+				// Se convierte el string que llega a un formato valido de fecha para su posterior evaluacion
+				var inicio= new Date(fecha_inicio[2],(parseInt(fecha_inicio[0], 10)-1),fecha_inicio[1]);
+				var fin= new Date(fecha_fin[2],(parseInt(fecha_fin[0], 10)-1),fecha_fin[1]);
+				var hoy = new Date();
+				var contador=0;
+				// Se valida que la fecha inicio sea valida
+				if(isNaN(inicio)){
+					$("#respuesta-cliente").html('<div class="alert alert-danger" role="alert">El formato de <b>fecha inicio</b> no es valido</div>');	
+					contador++;
+				}
+				// Se Valida que la fecha fin sea valida
+				if(isNaN(fin)){
+					$("#respuesta-cliente").html('<div class="alert alert-danger" role="alert">El formato de <b>fecha fin</b> no es valido</div>');	
+					contador++;
+				}
+				if(contador==0 && (inicio<=fin)){
+					// Una vez todo validado generamos un informe de estado al usuario en caso de que la operación se demore mucho
+					var barra= '<label>Procesando tu solicitud. Favor espera ...</label>';
+					barra+= '<div class="progress no-rounded progress-striped active">';
+					barra+= '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">';
+					barra+= '<span class="sr-only">40% Complete (success)</span>';
+					barra+= '</div></div>';
+					$("#respuesta-cliente").html(barra);
+					// Realizamos la petición ajax
+					$.ajax({
+						url: '/reportes/reporte-clientes/',
+						type: 'get',
+						dataType: 'json',
+						data: { 
+						'fecha_inicio': $("#fecha_inicio_cliente").val().split("/")[2]+'-'+$("#fecha_inicio_cliente").val().split("/")[0]+'-'+$("#fecha_inicio_cliente").val().split("/")[1], 
+						'fecha_fin': $("#fecha_fin_cliente").val().split("/")[2]+'-'+$("#fecha_fin_cliente").val().split("/")[0]+'-'+$("#fecha_fin_cliente").val().split("/")[1],
+						},
+						success: function (data) {
+							reporte_almacenes= data;
+							// Construimos la tabla para mostrar los resultados
+							var html= '<div class="table-responsive">';
+								html+='	<table id="datatable-clientes" class="table table-striped table-bordered" cellspacing="0" width="100%">';
+								html+='		<thead>';
+								//Inicio Cabecera
+								html+='			<tr>';
+								html+='				<th>Documento</th>';
+								html+='				<th>Nombres</th>';
+								html+='				<th>Numero de compras</th>';
+								html+='				<th>Valor total compras</th>';
+								html+='			</tr>';
+								//Fin Cabecera
+								html+='		</thead>';
+								html+='		<tbody>';
+							for (var i = 0; i < data.length; i++) {
+								html+='			<tr>';
+								html+='				<td>'+data[i].documento+'</td>';
+								html+='				<td>'+data[i].nombre+'</td>';
+								html+='				<td>'+data[i].numero_compras+'</td>';
+								html+='				<td><u><b>$ '+data[i].valor+'</b></u></td>';
+								html+='			</tr>';
+							};
+								html+='		</tbody>';
+								html+='	</table>';
+								html+='</div>';
+								// Agregamos botones de exportar
+								html+='<br><div style="text-align:center">';
+								html+='<a target="_blank" href="';
+								// Agregamos la url para exportar
+								var datos_envio= 'fecha_inicio='+$("#fecha_inicio_cliente").val().split("/")[2]+'-'+$("#fecha_inicio_cliente").val().split("/")[0]+'-'+$("#fecha_inicio_cliente").val().split("/")[1]+'&fecha_fin='+$("#fecha_fin_cliente").val().split("/")[2]+'-'+$("#fecha_fin_cliente").val().split("/")[0]+'-'+$("#fecha_fin_cliente").val().split("/")[1];
+								html+='/reportes/generar-reporte-cliente-pdf/?'+datos_envio;
+
+								html+='" class="btn btn-primary"><i class="fa fa-print"></i> Imprimir</a> <a id="graficar_clientes" class="btn btn-primary"><i class="fa fa-bar-chart"></i> Graficar</a>';
+								html+=' <a class="btn btn-primary exportar_excel" data-tabla="datatable-clientes"><i class="fa fa-external-link"></i> Exportar Excel</a>';
+								html+='</div>';
+							$("#respuesta-cliente").html(html);
+							agregarDataTable("#datatable-clientes",3);
+							console.log(data);
+						},
+						error: function (data) {
+							$("#respuesta-cliente").html('<div class="alert alert-danger" role="alert">No se puede procesar tu solicitud. Favor intenta más tarde</div>');	
+						}
+					});
+				}else{
+					$("#respuesta-cliente").html('<div class="alert alert-warning" role="alert">Recuerda que <b>fecha inicio</b> debe ser menor o igual a <b>fecha fin</b></div>');	
+				}
+			}else{
+				$("#respuesta-cliente").html('<div class="alert alert-warning" role="alert">Favor Complete todos los campos</div>');
+			}
+		});
+
+		// Esta función grafica los resultados del reporte clientes vs compras 
+		$("body").on('click', '#graficar_clientes', function(event) {
+			// Construimos el diccionario para poder graficar los datos
+			var data= [];
+			var limite=10;
+			if (reporte_almacenes.length<10){
+				limite=reporte_almacenes.length;
+			}
+			for (var i = 0; i < limite; i++) {
+				data.push({ y: reporte_almacenes[i].nombre.replace(/ /g,"\n"), a: reporte_almacenes[i].valor });
+			};
+			// Construimos la gráfica
+			$("#respuesta-cliente").html("");
+			$("#respuesta-cliente-grafica").css('height', '300px');
+			Morris.Bar({
+			  element: 'respuesta-cliente-grafica',
+			  resize: true,
+			  data: data,
+			  xkey: 'y',
+			  ykeys: ['a'],
+			  labels: ['Series A'],
+			  barColors: ['#209c84'],
+			});
+			$("#respuesta-cliente-grafica").css("height","auto");
+			$("#respuesta-cliente-grafica").append("<div style='text-align:center'><a class='btn btn-primary limpiar'><i class='fa fa-trash'></i> Limpiar</a> <a data-titulo='Clientes Vs Compras entre "+$("#fecha_inicio_cliente").val()+" y "+$("#fecha_fin_cliente").val()+"' class='btn btn-primary imprimir_grafica'><i class='fa fa-download'></i> Descargar Gráfica</a></div>");
+		});
+
+		// Esta funcion se utiliza para generar el reporte de los clientes
+		$("#buscar-dias").on('click', function(event) {
+			// Se valida que se hayan completado todos los campos
+			if($("#fecha_inicio_dias").val()!="" && $("#fecha_fin_dias").val()!=""){
+				var fecha_inicio= $("#fecha_inicio_dias").val().split("/");
+				var fecha_fin= $("#fecha_fin_dias").val().split("/");
+				// Se convierte el string que llega a un formato valido de fecha para su posterior evaluacion
+				var inicio= new Date(fecha_inicio[2],(parseInt(fecha_inicio[0], 10)-1),fecha_inicio[1]);
+				var fin= new Date(fecha_fin[2],(parseInt(fecha_fin[0], 10)-1),fecha_fin[1]);
+				var hoy = new Date();
+				var contador=0;
+				// Se valida que la fecha inicio sea valida
+				if(isNaN(inicio)){
+					$("#respuesta-dias").html('<div class="alert alert-danger" role="alert">El formato de <b>fecha inicio</b> no es valido</div>');	
+					contador++;
+				}
+				// Se Valida que la fecha fin sea valida
+				if(isNaN(fin)){
+					$("#respuesta-dias").html('<div class="alert alert-danger" role="alert">El formato de <b>fecha fin</b> no es valido</div>');	
+					contador++;
+				}
+				if(contador==0 && (inicio<=fin)){
+					// Una vez todo validado generamos un informe de estado al usuario en caso de que la operación se demore mucho
+					var barra= '<label>Procesando tu solicitud. Favor espera ...</label>';
+					barra+= '<div class="progress no-rounded progress-striped active">';
+					barra+= '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">';
+					barra+= '<span class="sr-only">40% Complete (success)</span>';
+					barra+= '</div></div>';
+					$("#respuesta-dias").html(barra);
+					// Realizamos la petición ajax
+					$.ajax({
+						url: '/reportes/reporte-dias/',
+						type: 'get',
+						dataType: 'json',
+						data: { 
+						'fecha_inicio': $("#fecha_inicio_dias").val().split("/")[2]+'-'+$("#fecha_inicio_dias").val().split("/")[0]+'-'+$("#fecha_inicio_dias").val().split("/")[1], 
+						'fecha_fin': $("#fecha_fin_dias").val().split("/")[2]+'-'+$("#fecha_fin_dias").val().split("/")[0]+'-'+$("#fecha_fin_dias").val().split("/")[1],
+						},
+						success: function (data) {
+							// Construimos la tabla para mostrar los resultados
+							var html= '<div class="table-responsive">';
+								html+='	<table id="datatable-dias" class="table table-striped table-bordered" cellspacing="0" width="100%">';
+								html+='		<thead>';
+								//Inicio Cabecera
+								html+='			<tr>';
+								html+='				<th></th>';
+							for (var i = 8; i < 23; i++) {
+								html+='				<th>'+i+'</th>';
+							};
+								html+='			</tr>';
+								//Fin Cabecera
+								html+='		</thead>';
+
+								//Ahora se crea una matriz que va a contener las estadisticas de cada dia
+								var matriz= new Array(7);
+								for (var i = 0; i < matriz.length; i++) {
+									matriz[i]= new Array(16)
+								};
+
+								//Ahora llenamos de ceros la matrix
+								for (var i = 0; i < 7; i++) {
+									for (var j = 0; j < 16; j++) {
+										matriz[i][j]=0;
+									};
+								};
+
+								// Ahora recorremos el resultado de la peticion ajax
+
+								for (var i = 0; i < data.length; i++) {
+									matriz[data[i].dia_semana][data[i].hora-7]++;
+								};
+
+								// Fin matriz
+								var vector_dias= ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+								// Una vez procesados los datos se construye la matriz
+								html+='		<tbody>';
+							for (var i = 0; i < 7; i++) {
+								html+='			<tr>';
+								html+='				<th>'+vector_dias[i]+'</th>';
+							for (var j = 1; j < 16; j++) {
+								html+='				<td data-cantidad-compras="'+matriz[i][j]+'"></td>';	
+							};
+								html+='			</tr>';
+							};
+								html+='		</tbody>';
+								html+='	</table>';
+								html+='</div>';
+							$("#respuesta-dias").html(html);
+							$("#btn-imprimir-dias").fadeIn();
+							$("#fecha_1_dias").html($("#fecha_inicio_dias").val());
+							$("#fecha_2_dias").html($("#fecha_fin_dias").val());
+							$(".titulo_ranking_dias").fadeIn();
+							agregarColores();
+						},
+						error: function (data) {
+							$("#respuesta-dias").html('<div class="alert alert-danger" role="alert">No se puede procesar tu solicitud. Favor intenta más tarde</div>');	
+							$("#btn-imprimir-dias").fadeOut();
+							$(".titulo_ranking_dias").fadeOut();
+						}
+					});
+				}else{
+					$("#respuesta-dias").html('<div class="alert alert-warning" role="alert">Recuerda que <b>fecha inicio</b> debe ser menor o igual a <b>fecha fin</b></div>');	
+					$("#btn-imprimir-dias").fadeOut();
+					$(".titulo_ranking_dias").fadeOut();
+				}
+			}else{
+				$("#respuesta-dias").html('<div class="alert alert-warning" role="alert">Favor Complete todos los campos</div>');
+				$("#btn-imprimir-dias").fadeOut();
+				$(".titulo_ranking_dias").fadeOut();
+			}
+		});
+
+
+		function agregarColores () {
+			var color1="#9933CC"; //Morado 80%
+			var color2="#6699CC"; //Verde 20%
+			var color3="#66C2A5"; //Azul 40%
+			var color4="#FEE855"; //Amarillo
+			var color5="#FF9933"; //Naranja 60%
+			var color6="#D53E4F"; //Rojo 100%
+			var colores=["",color1,color2,color3,color4,color5,color6];
+			// Agregamos la convencion a la pantalla
+			for (var i = 1; i < 7; i++) {
+				$("#color"+i).css({
+					width: '100%',
+					height: '17px',
+					background: colores[i],
+				});
+			};
+			// Ahora se determina el día con mayor venta
+			var mayor=1;
+			$("td[data-cantidad-compras]").each(function(index, el) {
+				var venta_diaria=parseInt($(this).attr('data-cantidad-compras'), 10);
+				if(venta_diaria>mayor){
+					mayor=venta_diaria;
+				}
+			});
+			// Ahora se distribuyen los demas colores entre los valores intermedios
+			// Se parte la diferencia en 6 Asignando colores de mayor a menor
+			$("td[data-cantidad-compras]").each(function(index, el) {
+				var venta_diaria=parseInt($(this).attr('data-cantidad-compras'), 10);
+				var resultado= 6*venta_diaria/mayor;
+				if(resultado>=0 && resultado<1){ // Amarillo
+					$(this).css('background', color1);
+				}else if(resultado>=1 && resultado<2){ // Verde
+					$(this).css('background', color2);
+				}else if(resultado>=2 && resultado<3){ // Azul
+					$(this).css('background', color3);
+				}else if(resultado>=3 && resultado<4){ // Naranja
+					$(this).css('background', color4);
+				}else if(resultado>=4 && resultado<5){ // Morado
+					$(this).css('background', color5);
+				}else if(resultado>=5 && resultado<=6){ // Rojo
+					$(this).css('background', color6);
+				}
+				
+			});
+		}
+
+		function partirCantidadEnSeis (cantidad,veces) {
+			var nueva_cantidad= cantidad/2;
+
+		}
+
+		$("body").on('click',".exportar_excel" , function(event) {
+			$("input[name=datos]").val(prepararParaExportar($(this).attr("data-tabla")));
+			$("#exportar_excel").submit();
+		});
+
+		function prepararParaExportar (tabla) {
+            var tabla_data_table=$("#"+tabla+"").DataTable();
+            var paginacion_actual=tabla_data_table.page.len();
+            tabla_data_table.page.len( 100000 ).draw();
+            var tabla_exportar={"cabecera":[],"cuerpo":[]};
+            $("#"+tabla+" thead th").each(function(a,b){
+                tabla_exportar.cabecera.push($(this).html());
+            });
+            var lista_temp=[];
+            $("#"+tabla+" tbody td").each(function(a,b){
+                if(((a)%(tabla_exportar['cabecera'].length))==0 && a!=0){
+                 tabla_exportar['cuerpo'].push(lista_temp);
+                 lista_temp=[];
+                }
+                lista_temp.push($(this).text());
+            });
+            tabla_exportar['cuerpo'].push(lista_temp);
+            tabla_data_table.page.len( paginacion_actual ).draw();
+            return JSON.stringify(tabla_exportar);          
+        }
+
+        $("body").on('click', '.limpiar', function(event) {
+        	$(this).parent().parent().html("");
+        });
+
+        $("body").on('click', '#desc_img_dias', function(event) {
+            $('#desc_img_dias span').html("Descargar");
+            imprimirDias();
+            /* Act on the event */
+        });
+
+        function imprimirDias () {
+            html2canvas(document.getElementById("reporte_total_dias"), {
+              onrendered: function(canvas) {
+                $("#desc_img_dias").attr('download', '');
+                $("#desc_img_dias").attr('href', canvas.toDataURL());
+              }
+            });
+        
+        }
+
+	</script>
+	<!-- Page Specific JS Libraries -->
+	<script src="/static/libs/jquery-datatables/js/jquery.dataTables.min.js"></script>
+	<script src="/static/libs/jquery-datatables/js/dataTables.bootstrap.js"></script>
+	<script src="/static/libs/jquery-datatables/extensions/TableTools/js/dataTables.tableTools.min.js"></script>
+	<script src="/static/js/pages/datatables.js"></script>
+{% endblock %}

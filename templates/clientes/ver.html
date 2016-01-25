@@ -1,0 +1,161 @@
+{% extends 'layout.html' %}
+{% block titulo %}{{cliente.nombres}} {{cliente.apellidos}}{% endblock %}
+{% block antes_contenido %}
+<div class="profile-banner" style="background-image: url(/static/img/profile.jpg);">
+	<div class="col-sm-3 avatar-container">
+		<img src="/static/img/{% if cliente.genero %}male{% else %}female{% endif %}.jpg" class="img-circle profile-avatar" alt="User avatar">
+	</div>
+</div>
+{% endblock %}
+{% block contenido %}
+<div class="row">
+	<div class="col-sm-3">
+		<!-- Begin user profile -->
+		<div class="text-center user-profile-2">
+			<h4>{{cliente.nombres}} {{cliente.apellidos}}</h4>
+			
+			<h5>{{cliente.correo}}</h5>
+			<ul class="list-group">
+			  <li class="list-group-item">
+				<span class="badge">{{edad}} Años</span>
+				Edad
+			  </li>
+			  <li class="list-group-item">
+				<span class="badge">{{boletas|length}}</span>
+				Facturas
+			  </li>
+			</ul>
+		</div><!-- End div .box-info -->
+		<br>
+		<br>
+		<!-- Begin user profile -->
+	</div><!-- End div .col-sm-4 -->
+	
+	<div class="col-sm-9">
+		<div class="widget widget-tabbed">
+			<!-- Nav tab -->
+			<ul class="nav nav-tabs nav-justified">
+			  <li class="active"><a href="#my-timeline" data-toggle="tab"><i class="fa fa-pencil"></i> Actividad</a></li>
+			  <li><a href="#about" data-toggle="tab"><i class="fa fa-user"></i> Información</a></li>
+			</ul>
+			<!-- End nav tab -->
+
+			<!-- Tab panes -->
+			<div class="tab-content">
+				
+				
+				<!-- Tab timeline -->
+				<div class="tab-pane animated active fadeInRight" id="my-timeline">
+					<div class="user-profile-content">
+						
+						<!-- Begin timeline -->
+						<div class="the-timeline">
+							<ul>
+								{% for b in boletas %}
+									<li>
+										<div class="the-date">
+											<span>{{b.fecha.day}}</span>
+											<small class="mes-a-letras">{{b.fecha.month}}</small>
+											<small>{{b.fecha.year}}</small>
+										</div>
+										<h4>Campaña <b><i>{{b.campania.nombre}}</i></b></h4>
+										<p>
+										Compra de <b><i>{{b.valor_factura}}</i></b> en el almacen <b><i>{{b.almacen.nombre}}</i></b> a las <b><i>{{b.fecha.hour}}:{{b.fecha.minute}}</i></b>
+										</p>
+									</li>
+								{% empty %}
+									<li>
+										<div class="the-date">
+											<br>
+											<small class="mes-a-letras">Hasta</small>
+											<small>Ahora</small>
+										</div>
+										<h4>Este cliente no reporta actividades</h4>
+										</p>
+									</li>
+								{% endfor %}
+								
+							</ul>
+						</div><!-- End div .the-timeline -->
+						<!-- End timeline -->
+					</div><!-- End div .user-profile-content -->
+				</div><!-- End div .tab-pane -->
+				<!-- End Tab timeline -->
+				
+				<!-- Tab about -->
+				<div class="tab-pane animated fadeInRight" id="about">
+					<div class="user-profile-content">
+						<h5><strong>INFORMACIÓN</strong></h5>
+						<p>
+						Acontinuación se encuentra la información proporcionada por la persona {{cliente}}
+						</p>
+						<hr />
+						<div class="row">
+							<div class="col-sm-6">
+								<h5><strong>PERSONAL</strong></h5>
+									<article>
+										<strong>Tipo de documento</strong><br>
+										<span title="Tipo de documento">{{cliente.tipo_documento}}</span>
+									</article>
+									<br>
+									<article>
+										<strong>Número documento</strong><br>
+										<span title="Número de documento">{{cliente.documento}}</span>
+									</article>
+									<br>
+									<article>
+										<strong>Fecha de Nacimiento</strong><br>
+										<span title="Fecha de nacimiento">{{cliente.fecha_nacimiento}}</span>
+									</article>
+									<br>
+									<article>
+										<strong>Estado Civil</strong><br>
+										<span title="Fecha de nacimiento">{{cliente.estado_civil}}</span>
+									</article>
+									<br>
+							</div>
+							<div class="col-sm-6">
+							<h5><strong>CONTACTO</strong></h5>
+									<article>
+										<strong>Ciudad</strong><br>
+										<span title="Departamento y ciudad de residencia">{{cliente.ciudad.nombre}}, {{cliente.ciudad.departamento.nombre}}</span>
+									</article>
+									<br>
+									<article>
+										<strong>Dirección</strong><br>
+										<span title="Dirección de residencia">{{cliente.direccion}}</span>
+									</article>
+									<br>
+									<article>
+										<strong>Teléfono</strong><br>
+										<span title="Teléfono">{{cliente.telefono}}</span>
+									</article>
+									<br>
+									<article>
+										<strong>Observaciones</strong><br>
+										<span title="Observaciones">{{cliente.observaciones|default:"Ninguna"}}</span>
+									</article>
+									<br>
+							</div>
+						</div><!-- End div .row -->
+					</div><!-- End div .user-profile-content -->
+				</div><!-- End div .tab-pane -->
+				<!-- End Tab about -->
+			</div><!-- End div .tab-content -->
+		</div><!-- End div .box-info -->
+	</div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+	$("#clientes").addClass("active");
+	var meses=["","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Junio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+	$(".mes-a-letras").each(function(index, el) {
+		var numero_mes=parseInt($(this).html(), 10);
+		$(this).html(meses[numero_mes]);
+	});
+</script>
+<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<script src="/static/libs/jquery-gmap3/gmap3.min.js"></script>
+<script src="/static/js/pages/google-maps.js"></script>
+{% endblock %}

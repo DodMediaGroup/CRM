@@ -1,0 +1,212 @@
+{% extends 'layout.html' %}
+{% block titulo %}
+Agregar Nuevo Almacen
+{% endblock %}
+{% block css %}
+<link href="/static/libs/jquery-notifyjs/styles/metro/notify-metro.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block contenido %}
+<div class="page-heading" style="display: block;">
+	<h1><img src="/static/img/iconos/almacenes.png" alt=""> Agregar almacén</h1>
+	<h3>Agrega un nuevo Almacen</h3>            	
+</div>
+{% if mensaje_exito %}
+<div class="alert alert-success alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_exito}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+
+{% if mensaje_error %}
+<div class="alert alert-danger alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_error}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+
+<div class="row">
+	<div class="col-md-12 portlets">
+		<form role="form" method="post" id="registerForm" action="/almacenes/agregar-almacen/">
+		{% csrf_token %}
+			<div class="widget">
+				<div class="widget-header transparent">
+					<h2><strong>Información del Almacén</strong></h2>
+				</div>
+				<div class="widget-content padding gris">
+					  <div class="form-group">
+					  	<div class="row">
+					  		<div class="col-sm-9">
+					  			<label>Nombre</label>
+								<input type="text" class="form-control" name="nombres">
+					  		</div>
+					  		<div class="col-sm-3">
+					  			<label>Número Local</label>
+								<input type="text" autocomplete="off" class="form-control" name="local">
+					  		</div>
+					  	</div>
+					  </div>
+					  <div class="form-group">
+					  	<div class="row">
+					  		<div class="col-sm-3">
+					  			<div class="form-group">
+								<label>Tipo de Documento</label>
+	                                <select class="form-control" name="tipo_doc">
+	                                    <option value="">-- Seleccione tipo --</option>
+	                                    <option value="NIT">NIT</option>
+	                                    <option value="CC">Cédula ciudadanía</option>
+	                                    <option value="Otro">Otro</option>
+	                                </select>
+							  	</div>
+					  		</div>
+					  		<div class="col-sm-9">
+					  			<label>Documento</label>
+								<input type="text" autocomplete="off" class="form-control" name="documento">
+					  		</div>
+					  	</div>
+					  	<div class="row">
+					  		<div class="col-sm-12">
+					  			<label>Nombre del Administrador</label>
+								<input type="text" class="form-control" name="apellidos">
+					  		</div>
+					  	</div>
+					  </div>
+					  <div class="row">
+					  	<div class="col-sm-4">
+					  		<div class="form-group">
+							<label>Categoría</label>
+	                            <select id="categorias" class="form-control" name="categoria">
+	                                <option value="">-- Seleccione una categoría --</option>
+	                                {% for c in categorias %}
+		                                <option value="{{c.identificador}}">{{c.nombre}}</option>
+	                                {% endfor %}
+	                                <option value="agregar">-- Agregar Nueva --</option>
+	                            </select>
+						  	</div>
+					  	</div>
+					  	<div class="col-sm-5">
+					  		<div class="form-group">
+								<label>Correo Electrónico</label>
+								<input type="text" class="form-control" name="correo">
+							  </div>
+					  	</div>
+					  	<div class="col-sm-3">
+					  		<div class="form-group">
+								<label>Teléfono</label>
+								<input type="text" class="form-control" name="telefono">
+							  </div>
+					  	</div>
+					  </div>
+				</div>
+			</div>
+			<div class="widget">
+				<div class="widget-header">
+					<h2><strong>Información adicional</strong> (Opcional)</h2>
+				</div>
+				<div class="widget-content padding gris">
+					<div class="form-group">
+						<label>Página Web</label>
+						<input type="text" class="form-control" name="pagina_web">
+					</div>
+					<div class="form-group">
+						<label>Facebook</label>
+						<input type="text" class="form-control" name="facebook">
+					</div>
+					<div class="form-group">
+						<label>Twitter</label>
+						<input type="text" class="form-control" name="twitter">
+					</div>
+					<div class="form-group">
+						<label class="control-label" id="captchaOperation"></label>
+							<div class="row">
+								<div class="col-sm-4">
+								<input type="text" class="form-control" name="captcha" />
+								</div>
+							</div>
+						</div>
+					<button type="submit" class="btn btn-primary">Registrar Almacén</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Agregar Nueva categoría</h4>
+      </div>
+      <div class="modal-body">
+        	<div class="row">
+        		<div class="col-sm-12">
+        			<label>Nombre de la Categoría</label>
+					<br>
+					<input id="nombre_nueva_categoria" type="text" class="form-control">
+        		</div>
+        	</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="button" id="btn_almacenar" data-dismiss="modal" class="btn btn-primary">Almacenar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block ajax %}
+<script>
+	$("select[name=categoria]").on('change', function(event) {
+		if($(this).val()=='agregar'){
+			$("#myModal").modal("show");
+		}
+	});
+</script>
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+	$("#agregar_almacenes").addClass("active");
+
+
+	$("#btn_almacenar").on('click', function(event) {
+		if ($("#nombre_nueva_categoria").val()=="") {
+			autohidenotify('error');	
+		}else{
+			$.ajax({
+				url: '/almacenes/agregar-categoria/',
+				type: 'get',
+				data: {'nombre': $("#nombre_nueva_categoria").val()},
+				success: function (data) {
+					if(data=="Ya se encuentra registrada"){
+						alert("Ya existe una categoría similar a la ingresada");
+					}else{	
+						autohidenotify('success');	
+						$("select[name=categoria]").val("");
+						var html='';
+						var html= '<option value="">-- Seleccione categoría --</option>';
+						for(var i=0; i<data.length ; i++){
+							html+='<option value="'+data[i].pk+'">'+data[i].fields.nombre+'</option>';
+						}
+						html+='<option value="agregar">-- Agregar Nueva --</option>';
+						$("select[name=categoria]").html(html);
+						$("select[name=categoria]").val("");
+					}
+				},
+				error:function (data) {
+					autohidenotify('error');	
+				}
+			});
+		};
+	});
+
+</script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.min.js"></script>
+<script src="/static/js/pages/form-validation.js"></script>
+<script src="/static/libs/jquery-notifyjs/notify.min.js"></script>
+<script src="/static/libs/jquery-notifyjs/styles/metro/notify-metro.js"></script>
+<script src="/static/js/pages/notifications.js"></script>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends 'layout.html' %}
+{% block titulo %}Almacenes registrados{% endblock %}
+{% block css %}
+<!-- Extra CSS Libraries Start -->
+<link href="/static/libs/jquery-datatables/css/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/jquery-datatables/extensions/TableTools/css/dataTables.tableTools.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/style.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/jquery-notifyjs/styles/metro/notify-metro.css" rel="stylesheet" type="text/css" />
+<!-- Extra CSS Libraries End -->
+{% endblock %}
+{% block contenido %}
+<div class="page-heading" style="display: block;">
+	<h1><img src="/static/img/iconos/almacenes.png" alt=""> Almacenes</h1>
+	<h3>Almacenes actualmente registrados</h3>            	
+</div>
+{% if mensaje_exito %}
+<div class="alert alert-success alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_exito}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+
+{% if mensaje_error %}
+<div class="alert alert-danger alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_error}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+<div class="row">
+	<div class="col-md-12">
+		<div class="widget">
+			<div class="widget-header">
+				<h2>Lista de Almacenes</h2>
+				<div class="additional-btn">
+					<a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+					<a href="#" class="widget-close"><i class="icon-cancel-3"></i></a>
+				</div>
+			</div>
+			<div class="widget-content gris">
+			<br>					
+				<div class="table-responsive">
+					<form class='form-horizontal' role='form'>
+					<table id="datatables-2" class="table table-striped table-bordered" cellspacing="0" width="100%">
+					        <thead>
+					            <tr>
+					            	<th>Nombre</th>
+					                <th>Administrador</th>
+					                <th>Categoría</th>
+					                <th>Opciones</th>
+					            </tr>
+					        </thead>
+					 
+					 
+					        <tbody>
+					        	{% for a in almacenes %}
+					        		<tr>
+					        			<td>
+					        				{{a.nombre}}
+					        			</td>
+					        			<td>
+					        				{{a.nombre_admin}}
+					        			</td>
+										<td>
+											{{a.categoria.nombre}}
+										</td>
+										<td>
+											<div class="btn-group btn-group-xs">
+												<a href="/almacenes/ver-almacen/?id_almacen={{a.identificador}}" data-toggle="tooltip" title="" class="btn btn-default" data-original-title="Ver Información"><i class="fa fa-eye"></i></a>
+											{% if "almacenes.change_almacen" in objeto_usuario.get_all_permissions %}
+												<a href="/almacenes/editar-almacen/?id_almacen={{a.identificador}}" data-toggle="tooltip" title="" class="btn btn-default" data-original-title="Editar"><i class="fa fa-edit"></i></a>
+											{% endif %}
+											{% if "almacenes.delete_almacen" in objeto_usuario.get_all_permissions %}
+												<a data-toggle="tooltip" 
+												title="" 
+												data-id-almacen="{{a.pk}}"
+												data-nombre="{{a}}"
+												class="btn btn-default" 
+												data-original-title="Eliminar Almacén">
+													<i class="fa fa-times"></i>
+												</a>
+							        		{% endif %}
+						        			</div>
+										</td>
+					        		</tr>
+					        	{% endfor %}
+					        </tbody>
+					    </table>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="modal-eliminar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Eliminar Cliente</h4>
+      </div>
+      <div class="modal-body">
+        ¿Está seguro que desea eliminar el almacén <b><span id="modal-label-cliente"></span></b>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <a href="" id="modal-link-eliminar" class="btn btn-danger">Eliminar almacén</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block ajax %}
+<script type="text/javascript">
+{% if "almacenes.delete_almacen" in objeto_usuario.get_all_permissions %}
+
+	$("a[data-id-almacen]").on('click', function(event) {
+	    $("#modal-label-almacen").html($(this).attr('data-nombres'));
+	    $("#modal-link-eliminar").attr("href","/almacenes/desactivar-almacen/?id_eliminar="+$(this).attr('data-id-almacen'));
+	    $("#modal-eliminar").modal("show");
+	});
+
+{% endif %}
+</script>
+{% endblock %}
+{% block js %}
+<script>
+	$("#ver_almacenes").addClass("active");
+</script>
+<!-- Page Specific JS Libraries -->
+<script src="/static/libs/jquery-datatables/js/jquery.dataTables.min.js"></script>
+<script src="/static/libs/jquery-datatables/js/dataTables.bootstrap.js"></script>
+<script src="/static/libs/jquery-datatables/extensions/TableTools/js/dataTables.tableTools.min.js"></script>
+<script src="/static/js/pages/datatables.js"></script>
+<script src="/static/libs/jquery-notifyjs/notify.min.js"></script>
+<script src="/static/libs/jquery-notifyjs/styles/metro/notify-metro.js"></script>
+<script src="/static/js/pages/notifications.js"></script>
+{% endblock %}

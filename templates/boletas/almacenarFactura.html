@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block titulo %}
+	Respuesta
+{% endblock titulo %}
+
+{% block contenido %}
+	<div class="page-heading" style="display: block;">
+		<h1><img src="/static/img/iconos/boletas.png" alt=""> Boletas</h1>
+		<h2>Registro exitoso. Procede a imprimir las boletas</h2>           	
+	</div>
+	{% if mensaje_exito %}
+	<div class="alert alert-success alert-dismissable">
+	    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	    {{mensaje_exito}} <a href="#" class="alert-link"></a>.
+	</div>
+	{% endif %}
+
+	{% if mensaje_error %}
+	<div class="alert alert-danger alert-dismissable">
+	    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	    {{mensaje_error}} <a href="#" class="alert-link"></a>.
+	</div>
+	{% endif %}
+{% endblock contenido %}

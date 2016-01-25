@@ -1,0 +1,84 @@
+{% extends 'layout.html' %}
+{% block titulo %}Agregar Nuevo Usuario{% endblock %}
+{% block contenido %}
+<div class="page-heading" style="display: block;">
+	<h1><img src="/static/img/iconos/usuarios-ico.png" alt=""> Usuarios</h1>
+	<h3>Edita el usuario <b><i>{{usuario.username}}</i></b></h3>            	
+</div>
+{% if mensaje_exito %}
+<div class="alert alert-success alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_exito}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+
+{% if mensaje_error %}
+<div class="alert alert-danger alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_error}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+
+<div class="row">
+	<div class="col-md-12 portlets">
+		<div class="widget">
+			<div class="widget-header transparent">
+				<h2><strong>Editar Usuario</strong></h2>
+				<div class="additional-btn">
+					
+					<a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+					<a href="#" class="widget-close"><i class="icon-cancel-3"></i></a>
+				</div>
+			</div>
+			<div class="widget-content padding gris">
+				<form role="form" method="post" id="registerForm" action="/usuarios/editar-usuario/?id={{usuario.id}}">
+				{% csrf_token %}
+				  	<div class="row">
+				  		<div class="col-sm-6 form-group">
+				  			<label>Nombres</label>
+							<input type="text" class="form-control" value="{{usuario.first_name}}" name="nombres">
+				  		</div>
+				  		<div class="col-sm-6 form-group">
+				  			<label>Apellidos</label>
+							<input type="text" class="form-control" value="{{usuario.last_name}}" name="apellidos">
+				  		</div>
+				  	</div>
+					<div class="row">
+						<div class="col-sm-8 form-group">
+							<label>Correo Electrónico</label>
+							<input type="text" class="form-control" value="{{usuario.email}}" name="correo">
+						</div>
+						<div class="col-sm-4 form-group">
+							<label for="grupo">Seleccione el grupo de usuario</label>
+							<select name="grupo" class="form-control">
+								<option value="">----</option>
+								{% for g in grupos %}
+									<option value="{{g.id}}">{{g.name}}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group">
+					<label class="control-label" id="captchaOperation"></label>
+						<div class="row">
+							<div class="col-sm-4">
+							<input type="text" class="form-control" name="captcha" />
+							</div>
+						</div>
+					</div>
+					<button type="submit" class="btn btn-primary">Actualizar información</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block js %}
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.min.js"></script>
+<script src="/static/js/pages/form-validation.js"></script>
+<script>
+	$("#agregar-usuarios").addClass("active");
+	$("select[name=grupo]").val("{{g_usuario.id}}");
+</script>
+{% endblock %}

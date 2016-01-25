@@ -1,0 +1,354 @@
+{% extends 'layout.html' %}
+{% load humanize %}
+{% block titulo %}Campañas registradas{% endblock %}
+{% block css %}
+<!-- Extra CSS Libraries Start -->
+<link href="/static/libs/jquery-datatables/css/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/jquery-datatables/extensions/TableTools/css/dataTables.tableTools.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/style.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/jquery-notifyjs/styles/metro/notify-metro.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/fullcalendar/fullcalendar.css" rel="stylesheet" type="text/css" />
+<!-- Extra CSS Libraries End -->
+<style type="text/css">
+	.datepicker{
+		z-index: 1050;
+	}
+</style>
+{% endblock %}
+{% block contenido %}
+<div class="page-heading" style="display: block;">
+	<h1><img src="/static/img/iconos/icono-campanias.png" alt=""> Campañas</h1>
+	<h3>Campañas actualmente registradas</h3>            	
+</div>
+{% if mensaje_exito %}
+<div class="alert alert-success alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_exito}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+
+{% if mensaje_error %}
+<div class="alert alert-danger alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_error}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+<!-- BEGIN MODAL -->
+<div class="modal fade" id="event-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title"><strong id="nombre_campania_modal"></strong></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                  <div class="col-sm-6">
+                    <label><strong>Fecha de Inicio:</strong></label>
+                    <p id="fecha_inicio_modal"></p>
+                    <label><strong>Fecha de cierre:</strong></label>
+                    <p id="fecha_cierre_modal"></p>
+                  </div>
+                  <div class="col-sm-6">
+                    <label><strong>Valor Boleta:</strong></label>
+                    <p id="valor_boleta_modal"></p>
+                    <label><strong>Estado:</strong></label>
+                    <p id="estado_modal"></p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <label><strong>Descripción:</strong></label>
+                    <p id="descripcion_modal"></p>
+                  </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="editar_campania_modal" href="" class="btn btn-primary">Ver detalles</a>
+                <!--<a id="deshabilitar_campania_modal" href="" class="btn btn-danger" data-funcion="desactivar" data-identificador="" data-dismiss="modal">Deshabilitar</a>-->
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END MODAL -->
+
+{# Inicio tabla de todas las campanias registradas #}
+<div class="row">
+  <div class="col-md-12">
+    <div class="widget">
+      <div class="widget-header">
+        <h2>Lista de todas las campañas</h2>
+        <div class="additional-btn">
+          
+          <a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+          <a href="#" class="widget-close"><i class="icon-cancel-3"></i></a>
+        </div>
+      </div>
+      <div class="widget-content gris">
+      <br>          
+        <div class="table-responsive">
+          <form class='form-horizontal' role='form'>
+          <table id="datatables-2" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                  <thead>
+                      <tr>
+                          <th>Nombre</th>
+                          <th>Fecha de inicio</th>
+                          <th>Fecha de cierre</th>
+                          <th>Almacenes Participantes</th>
+                          <th>Valor Boleta</th>
+                          <th>Estado</th>
+                          <th>Opciones</th>
+                      </tr>
+                  </thead>
+           
+           
+                  <tbody>
+                    {% for c in campanias %}
+                      <tr>
+                        <td>{{c.nombre}}</td>
+                        <td><span class="dia-a-letras">{{c.fecha_inicio.weekday}}</span> {{c.fecha_inicio.day}} de <span class="mes-a-letras">{{c.fecha_inicio.month}}</span> del {{c.fecha_inicio.year}}</td>
+                        <td><span class="dia-a-letras">{{c.fecha_fin.weekday}}</span> {{c.fecha_fin.day}} de <span class="mes-a-letras">{{c.fecha_fin.month}}</span> del {{c.fecha_fin.year}}</td>
+                        <td>
+                          {% for a in c.get_almacenes_participantes %}
+                            {{a}} {% if not forloop.last %},{% endif %}
+                          {% endfor %}
+                        </td>
+                        <td>{{c.valor_boleta|intcomma}}</td>
+                        <td style="text-align:center">
+                        {% if c.estado %}
+                        <span class="label label-success">Activa</span>
+                          {% else %}
+                        <span class="label label-danger">Inactiva</span>
+                          {% endif %}
+                        </td>
+                        <td style="width:135px;text-align:center">
+                          <div class="btn-group btn-group-xs">
+                           <a href="/campanias/ver_campania/?id={{c.identificador}}" data-toggle="tooltip" title="" class="btn btn-default" data-original-title="Ver Información detallada"><i class="fa fa-eye"></i></a>
+                           {% if "campanias.change_campania" in objeto_usuario.get_all_permissions %}
+                           <a href="/campanias/editar-campania/?id={{c.pk}}" data-toggle="tooltip" title="" class="btn btn-default" data-original-title="Editar información"><i class="fa fa-edit"></i></a>
+                           <a href="/campanias/editar-almacenes-campania/?id={{c.pk}}" data-toggle="tooltip" title="" class="btn btn-default" data-original-title="Editar Almacenes que participan"><i class="fa fa-list"></i></a>
+                           <a href="/campanias/desactivar-campania/?id_campania={{c.pk}}" data data-toggle="tooltip" title="" class="btn btn-default" data-identificador="{{c.pk}}" data-original-title="{% if c.estado %}Cerrar{% else %}Abrir{% endif %} Campaña"><i class="fa {% if c.estado %}fa-unlock{% else %}fa-lock{% endif %}"></i></a>                             
+                           {% endif %}
+                           {% if "campanias.delete_campania" in objeto_usuario.get_all_permissions %}
+                           <a  data-id-eliminar="{{c.pk}}" data-nombre="{{c}}" data-toggle="tooltip" title="" class="btn btn-default" data-original-title="Eliminar campaña y toda su información relacionada"><i class="fa fa-times"></i></a>  
+                           {% endif %}
+                          </div>
+                        </td>       
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+              </table>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{# Fin tabla campanias #}
+
+{# Inicio del calendario de eventos o campanias #}
+<div class="row">
+	<div class="col-md-12 portlets">
+		<div class="widget">
+			<div class="widget-header">
+				<h2>Calendario de campañas</h2>
+				<div class="additional-btn">
+					
+					<a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+					<a href="#" class="widget-close"><i class="icon-cancel-3"></i></a>
+				</div>
+			</div>
+		<div class="widget-content padding">
+        {# Mensaje de descripcion para el usuario #}
+        Para tener en cuenta: <br><br>
+		<div class="row">
+			<div class="col-sm-6">
+				<div class="progress">
+					<div class="progress-bar progress-bar__active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%; heigth:10px">
+						Campaña Activa
+						<span class="sr-only">100% Complete (danger)</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-6">
+				<div class="progress">
+					<div class="progress-bar progress-bar__deactive" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%; heigth:10px">
+						Campaña Inactiva
+						<span class="sr-only">100% Complete (danger)</span>
+					</div>
+				</div>
+			</div>
+		</div>
+          <br>  
+        {# Fin mensaje #}
+        <div class="col-md-12">
+            <div class="widget bg-white">
+                <div class="widget-body">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% if "campanias.delete_campania" in objeto_usuario.get_all_permissions %}
+<div class="modal fade" id="modal-eliminar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Eliminar Campaña</h4>
+      </div>
+      <div class="modal-body">
+        ¿Está seguro que desea eliminar la campaña <b><span id="modal-label"></span></b>? Al eliminarla, todas las factuas o boletas relacionadas se perderán y no se podrán recuperar.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <a href="" id="modal-link-eliminar" class="btn btn-danger">Si, eliminar campaña</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+{% block ajax %}
+<script type="text/javascript">
+  {% if "campanias.delete_campania" in objeto_usuario.get_all_permissions %}
+  $("a[data-id-eliminar]").on('click', function(event) {
+    $("#modal-label").html($(this).attr('data-nombre'));
+    $("#modal-link-eliminar").attr("href","/campanias/?id_eliminar="+$(this).attr('data-id-eliminar'));
+    $("#modal-eliminar").modal("show");
+  });
+  {% endif %}
+</script>
+{% endblock %}
+{% block js %}
+<script>
+	$("#ver_campanias").addClass("active");
+	var meses=["","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Junio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+	var dias=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+	$(".mes-a-letras").each(function(index, el) {
+		var numero_mes=parseInt($(this).html(), 10);
+		$(this).html(meses[numero_mes]);
+	});
+
+	$(".dia-a-letras").each(function(index, el) {
+		var numero_dia=parseInt($(this).html(), 10);
+		$(this).html(dias[numero_dia]);		
+	});
+</script>
+<!-- Page Specific JS Libraries -->
+<script src="/static/libs/jquery-datatables/js/jquery.dataTables.min.js"></script>
+<script src="/static/libs/jquery-datatables/js/dataTables.bootstrap.js"></script>
+<script src="/static/libs/jquery-datatables/extensions/TableTools/js/dataTables.tableTools.min.js"></script>
+<script src="/static/js/pages/datatables.js"></script>
+<script src="/static/libs/jquery-notifyjs/notify.min.js"></script>
+<script src="/static/libs/jquery-notifyjs/styles/metro/notify-metro.js"></script>
+<script src="/static/js/pages/notifications.js"></script>
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.min.js"></script>
+<script src="/static/js/pages/form-validation.js"></script>
+<script src="/static/libs/bootstrap-inputmask/inputmask.js"></script>
+<script src="/static/libs/fullcalendar/fullcalendar.min.js"></script>
+
+<script type="text/javascript">
+  $("#btn_activar_desactivar").on('click', function(event) {
+      desactivarCampania($("#btn_activar_desactivar").attr('data-identificador'));
+  });
+
+	function runCalendar() {
+        var $modal = $('#event-modal');
+        $('#draggable-events div.draggable-event').each(function () {
+            // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
+            // it doesn't need to have a start or end
+            var eventObject = {
+                title: $.trim($(this).text()) // use the element's text as the event title
+            };
+            // store the Event Object in the DOM element so we can get to it later
+            $(this).data('eventObject', eventObject);
+            // make the event draggable using jQuery UI
+            $(this).draggable({
+                zIndex: 999,
+                revert: true, // will cause the event to go back to its
+                revertDuration: 20 //  original position after the drag
+            });
+        });
+        /*  Initialize the calendar  */
+        var date = new Date();
+        var d = date.getDate();
+        var m = date.getMonth();
+        var y = date.getFullYear();
+        var form = '';
+        var calendar = $('#calendar').fullCalendar({
+            lang: 'es',
+            slotDuration: '00:15:00', /* If we want to split day time each 15minutes */
+            minTime: '08:00:00',
+            maxTime: '19:00:00',          
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            events: [
+	            {% for c in campanias %}
+	            {
+	            	title:"{{c.nombre}}",
+	                start: new Date({{c.fecha_inicio.year}},{{c.fecha_inicio.month}}-1,{{c.fecha_inicio.day}}),
+					        end: new Date({{c.fecha_fin.year}},{{c.fecha_fin.month}}-1,{{c.fecha_fin.day}}),
+                  boleta: {{c.valor_boleta}},
+                  identificador: {{c.identificador}},
+                  descripcion: '{{c.descripcion|default:"Ninguna"}}',
+                  {% if not c.estado %}
+                    estado:0,
+                    className: "progress-bar__deactive {{c.identificador}}_id_campania"
+                  {% else %}
+                    estado:1,
+                    className: "progress-bar__active {{c.identificador}}_id_campania"
+                  {% endif %}
+	            },
+	            {% endfor %}
+            ],
+            editable: false,
+            droppable: false, // this allows things to be dropped onto the calendar !!!
+            selectable: true,
+            eventClick: function (calEvent, jsEvent, view) {
+                $("#nombre_campania_modal").html(calEvent.title);
+                $("#valor_boleta_modal").html(calEvent.boleta);
+                $("#fecha_inicio_modal").html(calEvent.start.toDateString());
+                $("#fecha_cierre_modal").html(calEvent.end.toDateString());
+                $("#descripcion_modal").html(calEvent.descripcion);
+                $("#editar_campania_modal").attr('href', '/campanias/ver_campania/?id='+calEvent.identificador);
+                $("#deshabilitar_campania_modal").attr('href', '/campanias/desactivar-campania/?id_campania='+calEvent.identificador);
+                if(!$(this).hasClass('progress-bar-success')){
+                  $("#btn_activar_desactivar").html("Habilitar");
+                  $("#btn_activar_desactivar").attr('data-funcion', 'activar');
+                  $("#btn_activar_desactivar").removeClass('btn-danger');
+                  $("#btn_activar_desactivar").addClass('btn-success');
+                  $("#estado_modal").html('<span class="label label-danger">Inactiva</span>');
+                }else{
+                  $("#btn_activar_desactivar").html("Deshabilitar");
+                  $("#btn_activar_desactivar").attr('data-funcion', 'desactivar');
+                  $("#btn_activar_desactivar").addClass('btn-danger');
+                  $("#btn_activar_desactivar").removeClass('btn-success');
+                  $("#estado_modal").html('<span class="label label-success">Activa</span>');
+                }
+                $("#btn_activar_desactivar").attr('data-identificador', calEvent.identificador);
+                $modal.modal({
+                     backdrop: 'static'
+                 });
+            }
+
+        });
+    }
+
+    runCalendar();
+    //$(".fc-event").addClass("progress no-rounded progress-striped");
+</script>
+{% endblock %}

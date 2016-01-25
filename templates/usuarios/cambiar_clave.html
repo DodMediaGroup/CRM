@@ -1,0 +1,73 @@
+{% extends 'layout.html' %}
+{% block titulo %}Cambiar Contraseña{% endblock %}
+{% block contenido %}
+<div class="page-heading" style="display: block;">
+	<h1><img src="/static/img/iconos/usuarios-ico.png" alt=""> Cambiar contraseña</h1>
+  <br>
+</div>
+{% if mensaje_exito %}
+<div class="alert alert-success alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_exito}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+
+{% if mensaje_error %}
+<div class="alert alert-danger alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_error}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+
+<div class="row">
+	<div class="col-md-12 portlets">
+		<form role="form" method="post" id="registerForm" action="">
+		{% csrf_token %}
+			<div class="widget">
+				<div class="widget-header transparent">
+					<h2><strong>Cambiar Contraseña</strong></h2>
+				</div>
+				<div class="widget-content padding gris">
+					  	<div class="row">
+					  		<div class="col-sm-12">
+					  			<div class="form-group">
+									<label>Ingrese su contraseña actual</label>
+									<input type="password" autocomplete="off" class="form-control" name="actual">
+								</div>
+					  		</div>
+					  	</div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                  <label>Digite su nueva contraseña</label>
+                  <input type="password" autocomplete="off" class="form-control" name="password">
+                </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                  <label>Favor repita su nueva contraseña</label>
+                  <input type="password" autocomplete="off" class="form-control" name="confirmPassword">
+                </div>
+                </div>
+              </div>
+  					  <div class="form-group">
+  						<label class="control-label" id="captchaOperation"></label>
+  							<div class="row">
+  								<div class="col-sm-4">
+  								<input type="text" class="form-control" name="captcha" />
+  								</div>
+  							</div>
+  						</div>
+						<button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+{% endblock %}
+{% block js %}
+<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.min.js"></script>
+<script src="/static/js/pages/form-validation.js"></script>
+{% endblock %}

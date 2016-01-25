@@ -1,0 +1,100 @@
+{% extends 'layout.html' %}
+{% load humanize %}
+{% block titulo %}{{campania.nombre}}{% endblock %}
+{% block contenido %}
+<div class="page-heading" style="display: block;">
+	<h1><img src="/static/img/iconos/icono-campanias.png" alt=""> Campaña {{campania.nombre}}</h1>      	
+</div>
+{% if mensaje_exito %}
+<div class="alert alert-success alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_exito}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+
+{% if mensaje_error %}
+<div class="alert alert-danger alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_error}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="row" style="padding-bottom: 6px;">
+					<div class="col-sm-6" style="padding-right: 4px;">
+						<div class="titulo-campania">
+							{{campania.nombre}}
+						</div>
+					</div>
+					<div class="col-sm-6" style="padding-left: 4px;">
+						<div class="col-sm-8 numero-boletas-campania">TOTAL BOLETAS REGISTRADAS </div>
+						<div class="col-sm-4 numero-boletas-campania" style="text-align:right"><strong>{{campania.boleta_set.all|length}}</strong></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6" style="padding-right: 4px;">
+						<div class="numero-boletas-campania">
+							INICIO <br>
+							<span data-fecha="inicio" class="formato_fecha">{{campania.fecha_inicio.weekday}}-{{campania.fecha_inicio.day}}-{{campania.fecha_inicio.month}}-{{campania.fecha_inicio.year}}</span>
+			            	<span>
+			            		a las {{campania.fecha_inicio.hour}}:{{campania.fecha_inicio.minute}}
+			            	</span>
+			            	<br><br>
+			            	CIERRE <br>
+			            	<span data-fecha="fin" class="formato_fecha">{{campania.fecha_fin.weekday}}-{{campania.fecha_fin.day}}-{{campania.fecha_fin.month}}-{{campania.fecha_fin.year}}</span>
+							<span>
+			            		a las {{campania.fecha_fin.hour}}:{{campania.fecha_fin.minute}}
+			            	</span>
+						</div>
+					</div>
+					<div class="col-sm-6" style="padding-left: 4px;">
+						<div class="numero-boletas-campania">
+							<div class="progress progress-sm progress-striped active">
+							  <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: {{campania.porcentaje_campania}}%">
+								<span class="sr-only">80% Complete</span>
+							  </div>
+							</div>
+							<div style="text-align:center">
+								Tiempo transcurrido de la campaña <br>
+								<span style="font-size:27px">
+									{{campania.porcentaje_campania}}%
+								</span> 
+							</div>
+						</div>
+					</div>
+				</div>
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-sm-12">
+			<h4><strong>Almacenes que participan:</strong></h4>
+			<p style="text-align:justify;color:#A3A09D">
+				{% for a in campania.campaniaalmacen_set.all %}
+					<a target="_blank" href="/almacenes/ver-almacen/?id_almacen={{a.almacen.pk}}">{{a.almacen}}</a>
+					{% if not forloop.last %},{% endif %}
+				{% endfor %}
+			</p>
+			<h4><strong>Valor de la boleta:</strong></h4>
+			<p style="text-align:justify;color:#A3A09D">{{campania.valor_boleta|intcomma}}</p>
+			<h4><strong>Descripción:</strong></h4>
+			<p style="text-align:justify;color:#A3A09D">{{campania.descripcion|default:"Ninguna"}}</p>
+		</div>
+	</div>
+{% endblock %}
+{% block js %}
+<script>
+	$("#campanias").addClass("active");
+	$(".formato_fecha").each(function(index, el) {
+			// Primero se le da formato a la fecha para que sea un poco
+			// mas legible para el usuario
+			var vector= $(this).html().split("-");
+			var dias_semana= ["Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"];
+			var meses= ["","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+			$(this).html(dias_semana[parseInt(vector[0], 10)]+", "+vector[1]+" de "+meses[parseInt(vector[2], 10)]+" del "+vector[3]);
+			// Ahora recogemos la fecha final, la inicial y la hora exacta en este momento
+			// para definir un porcentaje
+			
+		});
+</script>
+{% endblock %}

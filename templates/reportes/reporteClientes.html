@@ -1,0 +1,596 @@
+{% extends 'layout.html' %}
+{% load humanize %}
+{% block titulo %}Reportes de clietnes{% endblock %}
+{% block css %}
+<!-- Extra CSS Libraries Start -->
+<link href="/static/libs/jquery-datatables/css/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/jquery-datatables/extensions/TableTools/css/dataTables.tableTools.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/style.css" rel="stylesheet" type="text/css" />
+<link href="/static/libs/jquery-notifyjs/styles/metro/notify-metro.css" rel="stylesheet" type="text/css" />
+<!-- Extra CSS Libraries End -->
+{% endblock %}
+{% block contenido %}
+<div class="page-heading" style="display: block;">
+	<h1><img src="/static/img/iconos/clientes-logo.png" alt=""> Clientes</h1> 
+	<h3>Reportes de clientes</h3>            	
+</div>
+{% if mensaje_exito %}
+<div class="alert alert-success alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_exito}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+{% if mensaje_warning %}
+<div class="alert alert-warning alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_warning}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+{% if mensaje_error %}
+<div class="alert alert-danger alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{mensaje_error}} <a href="#" class="alert-link"></a>.
+</div>
+{% endif %}
+
+<div class="row">
+	<div class="col-sm-1"></div>
+	<div class="col-sm-5" style="margin-right: 7px;">
+		<div class="row rojo">
+			<div class="col-sm-12 home-clientes">
+				<i class="fa fa-suitcase"></i> <span style="font-size:25px">Clientes</span>
+			</div>
+		</div>
+		<div class="row gris home-clientes-numero">
+			<div class="col-sm-7">
+				No. de clientes 
+			</div>
+			<div class="col-sm-5 center">
+				<span class="numero_clientes">{{clientes|length|intcomma}}</span>
+			</div>
+		</div>
+		<div class="row gris home-clientes-numero">
+			<div class="col-sm-12 center">
+				Género vs Edades
+				<hr>
+			</div>
+			<div class="col-sm-12 estadistica center">
+				<label>Construyendo reporte, favor espera ...</label>
+				<div class="progress no-rounded progress-striped active">
+				  <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
+					<span class="sr-only">20% Complete (warning)</span>
+				  </div><!-- .progress-bar .progress-bar-warning -->
+				</div>
+				<hr>
+			</div>
+			<div class="col-sm-12">
+				<div class="col-sm-6 center">
+					<img src="/static/img/iconos/icon-female.png" alt=""><br>
+					<span class="procentaje_mujeres"></span>
+				</div>
+				<div class="col-sm-6 center">
+					<img src="/static/img/iconos/icon-male.png" alt=""><br>
+					<span style="color:rgb(0,175,136)" class="procentaje_hombres"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm-5">
+			<div class="row verde">
+				<div class="col-sm-12 home-clientes">
+					<i class="fa fa-map-marker"></i> <span style="font-size:25px">Ciudades</span>
+				</div>
+			</div>
+			<div class="row gris home-clientes-numero">
+				<div class="col-sm-7">
+					No. de Ciudades 
+				</div>
+				<div class="col-sm-5 center">
+					<span style="color:#209c84">{{numero_ciudades|length|intcomma}}</span>
+				</div>
+			</div>
+			<div class="row gris home-clientes-numero">
+				<div class="col-sm-12 center">
+					Clientes por ciudad
+					<hr>
+				</div>
+				<div style="font-size:16px" class="col-sm-12 center">
+					<div id="campania_line" style="height:177px">
+						{% for c in ciudades_principales %}
+						<div class="row">
+							<div class="col-xs-8">
+								{{c.ciudad}}
+							</div>
+							<div class="col-xs-4">
+								{{c.cantidad}}
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+				</div>
+				<div class="col-sm-12">
+					<div class="col-sm-12 center">
+						<hr>
+						<br>
+					</div>
+				</div>
+			</div>
+		</div>
+</div>
+
+<hr>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="widget">
+			<div class="widget-header">
+				<h2>Lista de Clientes</h2>
+				<div class="additional-btn">
+					
+					<a href="#" class="widget-toggle"><i class="icon-down-open-2"></i></a>
+					<a href="#" class="widget-close"><i class="icon-cancel-3"></i></a>
+				</div>
+			</div>
+			<div class="widget-content gris">
+			<br>					
+				<div class="table-responsive">
+					<form class='form-horizontal' role='form'>
+					<table id="datatables-2" class="table table-striped table-bordered" cellspacing="0" width="100%">
+					        <thead>
+					        	<tr>
+					        		<td></td>
+					        		<td></td>
+					        		<td><span></span></td>
+					        		<td></td>
+					        		<td></td>
+					        		<td><select name="" id="edades" class="form-control">
+					        			<option value="0-100">Filtrar</option>
+					        			<option value="0-10">0 - 10</option>
+					        			<option value="11-14">11 - 14</option>
+					        			<option value="15-18">15 - 18</option>
+					        			<option value="19-22">19 - 22</option>
+					        			<option value="23-26">23 - 26</option>
+					        			<option value="27-30">27 - 30</option>
+					        			<option value="31-34">31 - 34</option>
+					        			<option value="35-38">35 - 38</option>
+					        			<option value="39-42">39 - 42</option>
+					        			<option value="43-46">43 - 46</option>
+					        			<option value="47-50">47 - 50</option>
+					        			<option value="51-54">51 - 54</option>
+					        			<option value="55-58">55 - 58</option>
+					        			<option value="59-62">59 - 62</option>
+					        			<option value="63-66">63 - 66</option>
+					        			<option value="67-70">67 - 70</option>
+					        			<option value="70-80">70 - 80</option>
+					        			<option value="80-90">80 - 90</option>
+					        		</select></td>
+					        	</tr>
+					            <tr>
+					                <th>Documento</th>
+					                <th>Nombres</th>
+					                <th>Ciudad</th>
+					                <th>Género</th>
+					                <th>Estado Civil</th>
+					                <th>Edad</th>
+					            </tr>
+					        </thead>
+					 
+					 
+					        <tbody>
+					        	{% for c in clientes %}
+					        		<tr>
+					        			<td>
+					        				{{c.documento}}
+					        			</td>
+					        			<td>
+					        				{{c.nombres}} {{c.apellidos}}
+					        			</td>
+										<td>
+											{{c.ciudad.nombre}}
+										</td>
+										<td>
+											{% if c.genero %}
+												Masculino
+											{% else %}
+												Femenino
+											{% endif %}
+										</td>
+										<td>
+											{{c.estado_civil|capfirst }}
+										</td>
+										<td class="fecha_nacimiento">
+											{{c.fecha_nacimiento.year}}-{{c.fecha_nacimiento.month}}-{{c.fecha_nacimiento.day}}
+										</td>
+					        		</tr>
+					        	{% endfor %}
+					        </tbody>
+					    </table>
+					</form>
+				</div>
+				{% if "clientes.change_cliente" in objeto_usuario.get_all_permissions %}
+				<div style="text-align:center">
+					<a  class="btn btn-primary exportar_excel" data-tabla="datatables-2" ><i class="fa fa-external-link"></i> Exportar a Excel</a>
+					<br><br>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+	<form action="/reportes/exportar-excel/" method="post" id="exportar_excel">
+        {% csrf_token %}
+        <input type="hidden" value="" name="datos">
+    </form>
+{% endblock %}
+{% block ajax %}
+<script type="text/javascript">
+
+/**
+ * Funcion que devuelve true o false dependiendo de si la fecha es correcta.
+ * Tiene que recibir el dia, mes y año
+ */
+function isValidDate(day,month,year)
+{
+    var dteDate;
+    
+    // En javascript, el mes empieza en la posicion 0 y termina en la 11 
+    //   siendo 0 el mes de enero
+    // Por esta razon, tenemos que restar 1 al mes
+    month=month-1;
+    // Establecemos un objeto Data con los valore recibidos
+    // Los parametros son: año, mes, dia, hora, minuto y segundos
+    // getDate(); devuelve el dia como un entero entre 1 y 31
+    // getDay(); devuelve un num del 0 al 6 indicando siel dia es lunes,
+    //   martes, miercoles ...
+    // getHours(); Devuelve la hora
+    // getMinutes(); Devuelve los minutos
+    // getMonth(); devuelve el mes como un numero de 0 a 11
+    // getTime(); Devuelve el tiempo transcurrido en milisegundos desde el 1
+    //   de enero de 1970 hasta el momento definido en el objeto date
+    // setTime(); Establece una fecha pasandole en milisegundos el valor de esta.
+    // getYear(); devuelve el año
+    // getFullYear(); devuelve el año
+    dteDate=new Date(year,month,day);
+    
+    //Devuelva true o false...
+    return ((day==dteDate.getDate()) && (month==dteDate.getMonth()) && (year==dteDate.getFullYear()));
+}
+
+/**
+ * Funcion para validar una fecha
+ * Tiene que recibir:
+ *  La fecha en formato ingles yyyy-mm-dd
+ * Devuelve:
+ *  true-Fecha correcta
+ *  false-Fecha Incorrecta
+ */
+function validate_fecha(fecha)
+{
+    var patron=new RegExp("^(19|20)+([0-9]{2})([-])([0-9]{1,2})([-])([0-9]{1,2})$");
+
+    if(fecha.search(patron)==0)
+    {
+        var values=fecha.split("-");
+        if(isValidDate(values[2],values[1],values[0]))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Esta función calcula la edad de una persona y los meses
+ * La fecha la tiene que tener el formato yyyy-mm-dd que es
+ * metodo que por defecto lo devuelve el <input type="date">
+ */
+function calcularEdad(fecha)
+{
+    if(validate_fecha(fecha)==true)
+    {
+        // Si la fecha es correcta, calculamos la edad
+        var values=fecha.split("-");
+        var dia = values[2];
+        var mes = values[1];
+        var ano = values[0];
+
+        // cogemos los valores actuales
+        var fecha_hoy = new Date();
+        var ahora_ano = fecha_hoy.getYear();
+        var ahora_mes = fecha_hoy.getMonth()+1;
+        var ahora_dia = fecha_hoy.getDate();
+        
+        // realizamos el calculo
+        var edad = (ahora_ano + 1900) - ano;
+        if ( ahora_mes < mes )
+        {
+            edad--;
+        }
+        if ((mes == ahora_mes) && (ahora_dia < dia))
+        {
+            edad--;
+        }
+        if (edad > 1900)
+        {
+            edad -= 1900;
+        }
+
+        // calculamos los meses
+        var meses=0;
+        if(ahora_mes>mes)
+            meses=ahora_mes-mes;
+        if(ahora_mes<mes)
+            meses=12-(mes-ahora_mes);
+        if(ahora_mes==mes && dia>ahora_dia)
+            meses=11;
+
+        // calculamos los dias
+        var dias=0;
+        if(ahora_dia>dia)
+            dias=ahora_dia-dia;
+        if(ahora_dia<dia)
+        {
+            ultimoDiaMes=new Date(ahora_ano, ahora_mes, 0);
+            dias=ultimoDiaMes.getDate()-(dia-ahora_dia);
+        }
+        return edad;
+        //document.getElementById("result").innerHTML="Tienes "+edad+" años, "+meses+" meses y "+dias+" días";
+    }else{
+        return fecha;
+    }
+}
+
+$(".fecha_nacimiento").each(function(index, el) {
+	$(this).html(calcularEdad($.trim($(this).text())));
+});
+</script>
+{% endblock %}
+{% block js %}
+<!-- Page Specific JS Libraries -->
+<script src="/static/libs/jquery-datatables/js/jquery.dataTables.min.js"></script>
+<script src="/static/libs/jquery-datatables/js/dataTables.bootstrap.js"></script>
+<script src="/static/libs/jquery-datatables/extensions/TableTools/js/dataTables.tableTools.min.js"></script>
+<script src="/static/js/pages/datatables-custom.js"></script>
+<script>
+	$("#reportes_clientes").addClass("active");
+</script>
+<script src="/static/libs/jquery-notifyjs/notify.min.js"></script>
+<script src="/static/libs/jquery-notifyjs/styles/metro/notify-metro.js"></script>
+<script src="/static/js/pages/notifications.js"></script>
+
+<script type="text/javascript">
+	$("#exportar_datos_link").on('click', function(event) {
+		var ciudad= $("#filtro_2").val();
+		var genero= $("#filtro_3").val();
+		var estado_civil= $("#filtro_4").val();
+		var edad= $("#edades").val();
+		$(this).attr('href', '/clientes/exportar-csv/?ciudad='+ciudad+'&genero='+genero+'&estado_civil='+estado_civil+'&edad='+edad);
+	});
+</script>
+
+<script>
+
+	function inicializar () {
+		return [{
+				"inicio":13,
+				"fin":17,
+				"resultados":{
+								"hombre":0,
+								"mujer":0,
+							},
+				"porcentaje":{
+								"hombre":0,
+								"mujer":0,
+							},
+				},
+				{
+				"inicio":18,
+				"fin":24,
+				"resultados":{
+								"hombre":0,
+								"mujer":0,
+							},
+				"porcentaje":{
+								"hombre":0,
+								"mujer":0,
+							},
+				},
+				{
+				"inicio":25,
+				"fin":34,
+				"resultados":{
+								"hombre":0,
+								"mujer":0,
+							},
+				"porcentaje":{
+								"hombre":0,
+								"mujer":0,
+							},
+				},
+				{
+				"inicio":35,
+				"fin":44,
+				"resultados":{
+								"hombre":0,
+								"mujer":0,
+							},
+				"porcentaje":{
+								"hombre":0,
+								"mujer":0,
+							},
+				},
+				{
+				"inicio":45,
+				"fin":55,
+				"resultados":{
+								"hombre":0,
+								"mujer":0,
+							},
+				"porcentaje":{
+								"hombre":0,
+								"mujer":0,
+							},
+				},
+				{
+				"inicio":55,
+				"fin":150,
+				"resultados":{
+								"hombre":0,
+								"mujer":0,
+							},
+				"porcentaje":{
+								"hombre":0,
+								"mujer":0,
+							},
+				},
+			];
+	}
+
+	var edades= inicializar();
+
+		var clientes=[
+			{% for c in clientes %}
+				{
+					"cliente":'{{c.documento}}',
+					"genero":{% if c.genero %}"hombre"{% else %}"mujer"{% endif %},
+					"edad":{{c.get_edad}}
+				},
+			{% endfor %}
+		];
+
+		function generarReporteGeneroEdades () {
+			for (var i = 0; i < clientes.length; i++) {
+				for (var j = 0; j < edades.length; j++) {
+					if(clientes[i]['edad']>=edades[j]['inicio'] && clientes[i]['edad']<=edades[j]['fin']){
+						if(clientes[i]['genero']=="hombre"){
+							edades[j]['resultados']['hombre']+=1;
+						}else{
+							edades[j]['resultados']['mujer']+=1;
+						}
+						j=edades.length;
+					}
+				};	
+			};
+			generarPorcentaje();
+		}
+
+		function generarPorcentaje () {
+			var hombres_global=0;
+			var mujeres_global=0;
+
+			for (var i = 0; i < edades.length; i++) {
+				var hombre= edades[i]['resultados']['hombre'];
+				var mujer= edades[i]['resultados']['mujer'];
+				var total= hombre+mujer;
+				// Calculamos el pocentaje por edades
+				if(total>0){
+					edades[i]['porcentaje']['hombre']= (100*hombre)/total;
+					edades[i]['porcentaje']['mujer']= (100*mujer)/total;	
+					// Se calcula el porcentaje global
+					hombres_global+=hombre;
+					mujeres_global+=mujer;
+				}
+
+			};
+
+			$(".procentaje_hombres").html((Number((100*hombres_global)/clientes.length).toFixed(2))+"%");
+			$(".procentaje_mujeres").html((Number((100*mujeres_global)/clientes.length).toFixed(2))+"%");
+			
+			$.ajax({
+				url: '/crm/generar_reporte_clientes/',
+				type: 'GET',
+				dataType: 'html',
+				data: {diccionario: JSON.stringify(edades)},
+				success:function (data) {
+					$(".estadistica").html(data);
+				}
+			});
+		}
+		generarReporteGeneroEdades ();
+
+
+		$("body").on('click',".exportar_excel" , function(event) {
+            $("input[name=datos]").val(prepararParaExportar($(this).attr("data-tabla")));
+            $("#exportar_excel").submit();
+        });
+
+        function prepararParaExportar (tabla) {
+            var tabla_data_table=$("#"+tabla+"").DataTable();
+            var paginacion_actual=tabla_data_table.page.len();
+            tabla_data_table.page.len( 100000 ).draw();
+            var tabla_exportar={"cabecera":[],"cuerpo":[]};
+            $("#"+tabla+" thead th").each(function(a,b){
+                tabla_exportar.cabecera.push($(this).html());
+            });
+            var lista_temp=[];
+            $("#"+tabla+" tbody td").each(function(a,b){
+                if(((a)%(tabla_exportar['cabecera'].length))==0 && a!=0){
+                 tabla_exportar['cuerpo'].push(lista_temp);
+                 lista_temp=[];
+                }
+                lista_temp.push($(this).text());
+            });
+            tabla_exportar['cuerpo'].push(lista_temp);
+            tabla_data_table.page.len( paginacion_actual ).draw();
+            return JSON.stringify(tabla_exportar);          
+        }
+
+
+
+        //
+        $(window).load(function() {
+        	var table = $('#datatables-2').DataTable();
+
+	        $("#edades").on('change', function(event) {
+		        table.draw();
+		    });
+
+		    $("td select").on('change', function(event) {
+	            var paginacion_actual=table.page.len();
+	            table.page.len( 100000 ).draw();
+		    	edades= inicializar();
+		    	clientes=[];
+		    	// Se recogen los datos de la tabla
+		    	$("tbody tr").each(function(index, el) {
+		    		var documento= ($(this).children('td')[0].textContent.trim());
+		    		var genero= ($(this).children('td')[3].textContent.trim());
+		    		var edad= ($(this).children('td')[5].textContent.trim());
+
+		    		if(genero=='Masculino'){
+		    			genero='hombre';
+		    		}else{
+		    			genero='mujer';
+		    		}
+
+		    		clientes.push({
+		    			'cliente':documento,
+		    			'genero':genero,
+		    			'edad':parseInt(edad, 10),
+		    		});
+		    	});
+		    	$(".numero_clientes").html(clientes.length);
+		    	generarReporteGeneroEdades ();
+		    	table.page.len( paginacion_actual ).draw();
+		    });	
+
+		    $.fn.dataTable.ext.search.push(
+		        function( settings, data, dataIndex ) {
+		            var value= $("#edades").val().split("-");
+		            var min = parseInt( value[0], 10 );
+		            var max = parseInt( value[1], 10 );
+		            var age = parseFloat( data[5] ) || 0; // use data for the age column
+		     
+		            if ( ( isNaN( min ) && isNaN( max ) ) ||
+		                 ( isNaN( min ) && age <= max ) ||
+		                 ( min <= age   && isNaN( max ) ) ||
+		                 ( min <= age   && age <= max ) )
+		            {
+		                return true;
+		            }
+		            return false;
+		        }
+		    );
+        });
+</script>
+{% endblock %}

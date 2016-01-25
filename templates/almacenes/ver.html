@@ -1,0 +1,165 @@
+{% extends 'layout.html' %}
+{% block titulo %}
+{{almacen.nombre}}
+{% endblock %}
+{% block contenido %}
+<div class="page-heading" style="display: block;">
+	<h1><img src="/static/img/iconos/almacenes.png" alt=""> {{almacen.nombre}}</h1>         	
+</div>
+<div class="row">
+	<br><br>
+	<div class="col-sm-12">
+		<div class="widget widget-tabbed">
+			<!-- Nav tab -->
+			<ul class="nav nav-tabs nav-justified">
+			  <li class="active"><a href="#my-timeline" data-toggle="tab"><i class="fa fa-pencil"></i> Campañas</a></li>
+			  <li><a href="#about" data-toggle="tab"><i class="fa fa-user"></i> Información</a></li>
+			</ul>
+			<!-- End nav tab -->
+
+			<!-- Tab panes -->
+			<div class="tab-content">
+				
+				
+				<!-- Tab timeline -->
+				<div class="tab-pane animated active fadeInRight" id="my-timeline">
+					<div class="user-profile-content">
+						
+						<!-- Begin timeline -->
+						<div class="the-timeline">
+							<ul>
+								{% for c in campania_almacen %}
+									<li>
+										<div class="the-date">
+											<span>{{c.campania.fecha_inicio.day}}</span>
+											<small class="mes-a-letras">{{c.campania.fecha_inicio.month}}</small>
+											<small>{{c.campania.fecha_inicio.year}}</small>
+										</div>
+										<h4>Participa en la Campaña <b><i>{{c.campania.nombre}}</i></b></h4>
+									</li>
+								{% empty %}
+									<li>
+										<div class="the-date">
+											<br>
+											<small class="mes-a-letras">Hasta</small>
+											<small>Ahora</small>
+										</div>
+										<h4>Este Almacen no reporta actividades</h4>
+										</p>
+									</li>
+								{% endfor %}
+							</ul>
+						</div><!-- End div .the-timeline -->
+						<!-- End timeline -->
+					</div><!-- End div .user-profile-content -->
+				</div><!-- End div .tab-pane -->
+				<!-- End Tab timeline -->
+				
+				<!-- Tab about -->
+				<div class="tab-pane animated fadeInRight" id="about">
+					<div class="user-profile-content">
+						<h5><strong>INFORMACIÓN</strong></h5>
+						<p>
+						A continuacion se muestra la información registrada para el almacén {{almacen}}
+						</p>
+						<hr />
+						<div class="row">
+							<div class="col-sm-6">
+								<h5><strong>Administrador</strong></h5>
+									<article>
+										<strong>Tipo de documento</strong><br>
+										<span title="Tipo de documento del Administrador">{{almacen.tipo_documento}}</span>
+									</article>
+									<br>
+									<article>
+										<strong>Documento</strong><br>
+										<span title="Número de documento del Administrador">{{almacen.documento}}</span>
+									</article>
+									<br>
+									<article>
+										<strong>Nombres</strong><br>
+										<span title="Nombres administrador">{{almacen.nombre_admin}}</span>
+									</article>
+									<br>
+									<article>
+										<strong>Estado</strong><br>
+										<span title="Activo o inactivo">
+											{% if almacen.estado %}Activo{% else %}Inactivo{% endif %}
+										</span>
+									</article>
+									<br>
+							</div>
+							<div class="col-sm-6">
+							<h5><strong>{{almacen.nombre}}</strong></h5>
+									<article>
+										<strong>Categoría</strong><br>
+										<span title="Categoría del almacen">{{almacen.categoria.nombre}}</span>
+									</article>
+									<br>
+									<article>
+										<strong>Número Local</strong><br>
+										<span title="Número local">{{almacen.numero_local}}</span>
+									</article>
+									<br>
+									<article>
+										<strong>Teléfono</strong><br>
+										<span title="teléfono">{{almacen.telefono}}</span>
+									</article>
+									<br>
+									<article>
+										<strong>Correo electrónico</strong><br>
+										<span title="">{{almacen.correo}}</span>
+									</article>
+									<br>
+							</div>
+						</div><!-- End div .row -->
+						<div class="row">
+							<div class="col-sm-12">
+								<h5><strong>Página web y redes sociales</strong></h5>
+									<article>
+										<strong>Página web</strong><br>
+										{% if almacen.pagina_web == '' %}
+										<span title="No se ha registrado página">Ninguna</span>
+										{% else %}
+										<a href="{{almacen.pagina_web}}" target="_blank">{{almacen.pagina_web}}</a>
+										{% endif %}
+									</article>
+									<br>
+									<article>
+										<strong>Facebook</strong><br>
+										{% if almacen.facebook == '' %}
+										<span title="No se ha registrado página">Ninguno</span>
+										{% else %}
+										<a href="{{almacen.facebook}}" target="_blank">{{almacen.facebook}}</a>
+										{% endif %}
+									</article>
+									<br>
+									<article>
+										<strong>Twitter</strong><br>
+										{% if almacen.twitter == '' %}
+										<span title="No se ha registrado página">Ninguno</span>
+										{% else %}
+										<a href="{{almacen.twitter}}" target="_blank">{{almacen.twitter}}</a>
+										{% endif %}
+									</article>
+									<br>
+							</div>
+						</div>
+					</div><!-- End div .user-profile-content -->
+				</div><!-- End div .tab-pane -->
+				<!-- End Tab about -->
+			</div><!-- End div .tab-content -->
+		</div><!-- End div .box-info -->
+	</div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+	$("#almacenes").addClass("active");
+	var meses=["","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Junio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+	$(".mes-a-letras").each(function(index, el) {
+		var numero_mes=parseInt($(this).html(), 10);
+		$(this).html(meses[numero_mes]);
+	});
+</script>
+{% endblock %}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<style type="text/css">
+
+	table, th,td{
+		border: 1px solid #ddd;
+		border-collapse: collapse;
+	}
+
+	table{
+		margin-bottom: 90px;
+	}
+	
+	body{
+		color:#5b5b5b;
+	}
+
+	th,td{
+		padding-top: 5px;
+		padding-left: 5px;
+	}
+</style>
+</head>    
+<body>
+	
+	<table style="width:98%;">
+		<tr>
+			<td colspan="3" style="text-align:center">
+				{% if campania %}
+					<h1> Reporte de Categorías vs Ventas para la campaña {{campania}}</h1>
+				{% else %}
+					<h1>Reporte Categorías Vs Ventas desde <u>{{fecha_inicio}}</u> hasta <u>{{fecha_fin}}</u></h1>
+				{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<th>
+				<h2>Nombre de la Categoría</h2>
+			</th>
+			<th>
+				<h2>Número de ventas</h2>
+			</th>
+			<th>
+				<h2>Valor total ventas</h2>
+			</th>
+		</tr>
+		{% for l in lista %}
+		<tr>
+			<th>
+				<h2>{{l.nombre}}</h2>
+			</th>
+			<th>
+				<h2>{{l.numero_ventas}}</h2>
+			</th>
+			<th>
+				<h2>$ {{l.valor}}</h2>
+			</th>
+		</tr>
+		{% endfor %}
+	</table>
+	
+	
+
+</body>
+</html>

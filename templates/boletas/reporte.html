@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<style type="text/css">
+
+	table, th,td{
+		border: 1px solid #ddd;
+		border-collapse: collapse;
+	}
+
+	table{
+		margin-bottom: 90px;
+	}
+	
+	body{
+		color:#5b5b5b;
+	}
+
+	th,td{
+		padding-top: 5px;
+		padding-left: 5px;
+	}
+</style>
+</head>    
+<body>
+	
+	{% for boleta in lista %}
+	<h2>Identificador de Boleta: {{boleta.pk}}{{forloop.counter}}</h2>
+	<table style="width:98%;">
+		<tr>
+			<td colspan="2">
+				<h1>Campaña: {{boleta.campania.nombre}}</h1>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h2>Nombre del cliente:</h2>
+			</td>
+			<td>
+				<h2>{{boleta.cliente.nombres}} {{boleta.cliente.apellidos}}</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h2>Número de documento:</h2>
+			</td>
+			<td>
+				<h2>{{boleta.cliente.documento}}</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h2>Almacén donde se realizó la compra:</h2>
+			</td>
+			<td>
+				<h2>{{boleta.almacen.nombre}}</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h2>Fecha de compra:</h2>
+			</td>
+			<td>
+				<h2>{{boleta.fecha}}</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h2>Valor por boleta para esta campaña:</h2>
+			</td>
+			<td>
+				<h2>{{boleta.campania.valor_boleta}}</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h2>Valor total de compra:</h2>
+			</td>
+			<td>
+				<h2><u>{{boleta.valor_factura}}</u></h2>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h2>Numero de Boletas correspondientes:</h2>
+			</td>
+			<td>
+				<h2>{{numero_boletas}}</h2>
+			</td>
+		</tr>
+
+	</table>
+	{% endfor %}
+	
+	
+
+</body>
+</html>

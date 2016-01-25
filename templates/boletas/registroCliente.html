@@ -1,0 +1,362 @@
+{% extends "layout.html" %}
+{% block titulo %}
+	Registrar cliente {{campania.nombre}}
+{% endblock titulo %}
+
+{% block contenido %}
+	<div class="page-heading" style="display: block;">
+		<h1><img src="/static/img/iconos/boletas.png" alt=""> Boletas</h1>
+		<h2>Paso 2 de 3</h2>
+		<h3>Selecciona el cliente dueño de la factura para la campaña <b><i>{{campania.nombre}}</i></b> y el almacén donde hiciste la compra.</h3>            	
+	</div>
+	{% if mensaje_exito %}
+	<div class="alert alert-success alert-dismissable">
+	    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	    {{mensaje_exito}} <a href="#" class="alert-link"></a>.
+	</div>
+	{% endif %}
+
+	{% if mensaje_error %}
+	<div class="alert alert-danger alert-dismissable">
+	    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	    {{mensaje_error}} <a href="#" class="alert-link"></a>.
+	</div>
+	{% endif %}
+	{# Seleccionar el almacen en donde realizo la compra. esto con el fin de que la compra del cliente si aplique para esta campania #}
+	<form action="" method="post" id="registerForm">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="widget">
+					<div class="widget-header">
+						<h2><strong>Seleccionar Almacén</strong></h2>
+					</div>
+					<div class="widget-content padding">
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<label>*Si el almacén no aparece en el siguiente campo, es por que no aplica para esta campaña</label>
+									<select id="lista_almacenes" name="almacen" class="form-control">
+										{% for ca in campania_almacen %}
+											{% if forloop.first %}
+												<option value="">-- Favor seleccione el almacén donde realizó la compra --</option>
+											{% endif %}
+											<option value="{{ca.almacen.identificador}}">{{ca.almacen.nombre}}</option>
+										{% empty %}
+											<option value="">Lo sentimos, no hay almacenes seleccionados para esta campaña</option>
+										{% endfor %}
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+
+	{# Formulario para busqueda de documentos en la base de datos #}
+	<div id="formulario-buscar" class="row">
+		<div class="col-sm-12">
+			<form class="registerForm" role="form" action="" method="post">
+				<div class="widget">
+					<div class="widget-header">
+						<h2><strong>Ingresa el documento del cliente</strong></h2>
+					</div>
+					<div class="widget-content padding">
+						<div class="row">
+							<div class="col-sm-4">
+					  			<div class="form-group">
+								<label>Tipo de Documento</label>
+	                                <select id="tipo_doc" class="form-control" name="tipo_doc">
+	                                    <option value="">-- Seleccione tipo --</option>
+	                                    <option value="CC">Cédula Ciudadanía</option>
+	                                    <option value="CE">Cédula Extrajera</option>
+	                                    <option value="TI">Tarjeta de Identidad</option>
+	                                    <option value="PP">Pasaporte</option>
+	                                    <option value="Otro">Otro</option>
+	                                </select>
+							  	</div>
+					  		</div>
+							<div class="col-sm-8">
+								<div class="form-group">
+									<label>Favor digite el número de documento de identidad del cliente</label>
+									<input id="documento" autocomplete="off" name="documento" type="text" class="form-control">
+								</div>
+							</div>
+							<div class="col-sm-6"></div>
+						</div>
+						<button class="btn btn-default" onclick="buscar_documento()">Verificar Documento</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	{# Mensaje de alerta para avisar al usuario que el documento ingresado no se encuentra registrado #}
+	<div id="mensaje-alerta" style="display:none" class="alert alert-info alert-dismissable"></div>
+	{# Formulario de registro de clientes en dado caso de que el documento no se encuentre en la base de datos #}
+	<div id="formulario-agregar" style="display:none" class="row">
+		<div class="col-md-12 portlets">
+			<form id="frm_agregar" method="post" class="registerForm" action="/boletas/registro-cliente/">
+			{% csrf_token %}
+				<div class="widget">
+					<div class="widget-header transparent">
+						<h2><strong>Información personal</strong></h2>
+					</div>
+					<input type="hidden" name="almacen">
+					<div class="widget-content padding">
+						  <div class="form-group">
+						  	{# Campos ocultos por que el formulario de busqueda de arriba lo ingresan #}
+						  	<input type="hidden" name="documento">
+						  	<input type="hidden" name="tipo_doc">
+						  	<input type="hidden" name="campania" value="{{campania.identificador}}">
+						  	<div class="row">
+						  		<div class="col-sm-6">
+						  			<label>Nombres</label>
+									<input type="text" class="form-control" name="nombres">
+						  		</div>
+						  		<div class="col-sm-6">
+						  			<label>Apellidos</label>
+									<input type="text" class="form-control" name="apellidos">
+						  		</div>
+						  	</div>
+						  </div>
+						  <div class="row">
+						  	<div class="col-sm-4">
+						  		<div class="form-group">
+								<label>Género</label>
+		                            <select class="form-control" name="genero">
+		                                <option value="">-- Seleccione género --</option>
+		                                <option value="1">Masculino</option>
+		                                <option value="0">Femenino</option>
+		                            </select>
+							  	</div>
+						  	</div>
+						  	<div class="col-sm-4">
+						  		<div class="form-group">
+						  			<label>Fecha de nacimiento</label>
+						  			<input autocomplete="off" type="text" name="fecha_nacimiento" class="form-control datepicker-input" placeholder="yyyy-mm-dd">
+						  		</div>
+						  	</div>
+						  	<div class="col-sm-4">
+						  		<div class="form-group">
+								<label>Estado Civil</label>
+		                            <select class="form-control" name="estado_civil">
+		                                <option value="">-- Seleccione estado --</option>
+		                                <option value="soltero">Soltero</option>
+		                                <option value="casado">Casado</option>
+		                                <option value="viudo">Viudo</option>
+		                                <option value="otro">Otro</option>
+		                            </select>
+							  	</div>
+						  	</div>
+						  </div>
+						  <div class="form-group">
+							<label>Correo Electrónico</label>
+							<input type="text" class="form-control" name="correo">
+						  </div>
+					</div>
+				</div>
+				<div class="widget">
+					<div class="widget-header">
+						<h2><strong>Información de Residencia</strong></h2>
+					</div>
+					<div class="widget-content padding">
+						<div class="form-group">
+							<div class="row">
+								<div class="form-group">
+									<div class="col-sm-8">
+										<label>Dirección</label>
+										<input type="text" class="form-control" name="direccion">
+									</div>
+									<div class="col-sm-4">
+										<label>Teléfono</label>
+										<input type="text" class="form-control" name="telefono">
+									</div>
+								</div>
+							</div>
+							<br>
+							<div class="row">
+								<div class="col-sm-6">
+									<div class="form-group">
+									<label>Departamento de residencia</label>
+		                                <select id="departamentos" class="form-control" name="departamento">
+		                                    <option value="">-- Seleccione departamento --</option>
+		                                    {% for d in departamentos %}
+		                                    <option value="{{d.identificador}}">{{d.nombre}}</option>
+		                                    {% endfor %}
+		                                </select>
+								  	</div>
+								</div>
+								<div class="col-sm-6">
+									<div class="form-group">
+									<label>Ciudad de residencia</label>
+		                                <select id="ciudades" class="form-control" name="ciudad">
+		                                    <option value="">-- Seleccione ciudad --</option>
+		                                </select>
+								  	</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-sm-12">
+									<label>Observaciones adicionales (Opcional)</label>
+									<textarea rows="6" placeholder="Ninguna" name="observaciones" style="resize: vertical" class="form-control"></textarea>
+								</div>
+							</div>
+							<br>
+							<div class="form-group">
+								<label class="control-label" id="captchaOperation"></label>
+									<div class="row">
+										<div class="col-sm-4">
+										<input type="text" class="form-control" name="captcha" />
+										</div>
+									</div>
+								</div>
+							<a id="link_almacenar_cliente" class="btn btn-primary">Registrar Usuario</a>
+						</div>
+					</div>
+				</div>
+			</form>			
+		</div>
+	</div>
+	{# Confirmacion de datos del cliente por si se encuentra registrado #}
+	<div id="confirmar-datos" style="display:none" class="row">
+		<div class="col-sm-12">
+			<div class="widget">
+				<form id="frm_confirmar_datos" action="/boletas/registro-cliente/" method="post">
+					{% csrf_token %}
+					<div class="widget-content padding">
+						<div class="row">
+							<div class="col-sm-12">
+								El documento 
+								<b>
+									<i>
+										<span class="_documento"></span>
+									</i>
+								</b> 
+								le pertenece a 
+								<b>
+									<i>
+										<span class="_nombres"></span>
+									</i>
+								</b> 
+								<br><br>
+								<input type="hidden" name="documento">
+								<input type="hidden" name="campania" value="{{campania.identificador}}">
+								<input type="hidden" id="hidden_almacen" name="almacen" value="">
+								<a id="link_confirmar_datos" class="btn btn-primary">Si, es esta persona</a>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock contenido %}
+
+{% block js %}
+	<script type="text/javascript">
+		$("#boletas").addClass("active");
+	</script>
+	<script src="/static/libs/bootstrap-validator/js/bootstrapValidator.min.js"></script>
+	<script src="/static/js/pages/form-validation.js"></script>
+{% endblock %}
+
+{% block ajax %}
+	<script type="text/javascript">
+		function buscar_documento() {
+			if($("#documento").val()!=""&&$("#tipo_doc").val()){
+				$.ajax({
+					url: '/boletas/buscar-documento/',
+					type: 'get',
+					dataType: 'json',
+					data: {'documento': $("#documento").val(),'tipo_doc':$("#tipo_doc").val()},
+					success: function (data) {
+						if(data!=''){
+							// Hacer una redirección para registrar la factura en el sistema
+							$("span._documento").html(data[0].fields.documento);
+							$('input[name="documento"]').val($("#documento").val());
+							$("span._nombres").html(data[0].fields.nombres+' '+data[0].fields.apellidos);
+							$("#confirmar-datos").show('slow');
+							console.log(data);
+						}else{
+							// Si no hay resultados se procede a mostrar el formulario de ingreo de clientes
+							// Primero se muestra un mensaje de alerta, avisando al cliente de que el documento no se encuentra registrado
+							$("#mensaje-alerta").html("La persona con el documento <b><i>"+$("#tipo_doc").val()+" "+$("#documento").val()+"</i></b> no se encuentra registrado. Proceda a registrarlo a continuación !!!");
+							$("#mensaje-alerta").show("slow");
+							// Ahora se agrega al nuevo formulario los datos anteriormente seleccionados
+							$('input[name="documento"]').val($("#documento").val());
+							$('input[name="tipo_doc"]').val($("#tipo_doc").val());
+							// Procedemos a hacer visible el formulario de agregar cliente
+							$("#formulario-agregar").show("slow");
+						}
+					},
+					error: function (data) {
+						// body...
+					}
+				});
+			}
+		}
+
+		// Ahora validamos que si el usuario cambia el docuemento el formulario se oculte, en dado caso que el nuevo documento ingresado si exista en la base de datos
+
+		$("#documento").on('keyup',  function(event) {
+			$("#formulario-agregar").hide("slow");
+			$("#mensaje-alerta").hide("slow");
+			$("#confirmar-datos").hide('slow');
+		});
+
+		$("#tipo_doc").on('change', function(event) {
+			$("#formulario-agregar").hide("slow");
+			$("#mensaje-alerta").hide("slow");
+		});
+		// Se utiliza esta opción para validar que el almacen donde se realizó la compra 
+		// también sea seleccionado ya que este dato puede ir a dos formularios al mismo tiempo
+		$("#link_almacenar_cliente").on('click', function(event) {
+			var formAgregar = $("#frm_agregar").data('bootstrapValidator');
+			var almacenes = $("#registerForm").data('bootstrapValidator');
+			formAgregar.validate();
+			almacenes.validate();
+			if(formAgregar.isValid() && almacenes.isValid()){
+				$("input[name=almacen]").val($("#lista_almacenes").val());
+				formAgregar.defaultSubmit();
+			}
+		});
+		// Se utiliza esta opción para validar que el almacen donde se realizó la compra 
+		// también sea seleccionado ya que este dato puede ir a dos formularios al mismo tiempo
+		$("#link_confirmar_datos").on('click', function(event) {
+			var formValidation = $("#registerForm").data('bootstrapValidator');
+			formValidation.validate();
+			if(formValidation.isValid()){
+				$("input[name=almacen]").val($("#lista_almacenes").val());
+				$("#frm_confirmar_datos").submit();
+			}
+		});
+	</script>
+	
+	{# Este apartado se usa para la función de requerir los municipios de acuerdo a su departamento mediante ajax #}
+	<script type="text/javascript">
+			$("#departamentos").on('change', function(event) {
+		if($(this).val()!=""){
+			buscar_municipios($(this).val());
+		}
+	});
+
+	function buscar_municipios (departamento_id) {
+		$.ajax({
+			url: '/clientes/buscar-municipio/',
+			type: 'get',
+			data: {"departamento_id": departamento_id},
+			success: function (data) {
+				var html= '<option value="">-- Seleccione ciudad --</option>';
+				for(var i=0; i<data.length ; i++){
+					html+='<option value="'+data[i].pk+'">'+data[i].fields.nombre+'</option>';
+				}
+				$("#ciudades").html(html);
+			},
+			error: function (data) {
+				// body...
+			}
+		});
+	}
+	</script>
+{% endblock ajax %}

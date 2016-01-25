@@ -1,0 +1,19 @@
+{% for e in estadistica %}
+	<div class="row">
+		<div class="col-xs-3 center">
+			{{e.inicio}}-{{e.fin}}
+		</div>
+		<div class="col-xs-5 center">
+			<div class="progress">
+			  <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: {{e.porcentaje.mujer}}%">
+				<span class="sr-only"></span>
+			  </div>
+			  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: {{e.porcentaje.hombre}}%">
+				<span class="sr-only"></span>
+			  </div>
+			</div>
+		</div>
+		<div class="col-xs-4 center">{{e.resultados.mujer}}/{{e.resultados.hombre}}</div>
+	</div>
+{% endfor %}
+<hr>
